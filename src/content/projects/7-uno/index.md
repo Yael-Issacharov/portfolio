@@ -6,7 +6,7 @@ disciplines:
   - "Eyewear Design"
 studio: "Barner Brand"
 role: Designer
-years: "2021–2022"
+years: "2022"
 order: 6
 roles: ["Concept", "Product Development", "Industrial Design", "Product Management", "3D Design"]
 collaborators: ["Barner (brand)"]

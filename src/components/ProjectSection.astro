@@ -1,0 +1,171 @@
+---
+// Renders ONE project section. The project page loops over the `sections`
+// list in the content file and hands each one to this component, which draws
+// the right layout for its `type`. The optional UPPERCASE `label` sits in the
+// left margin on desktop and above the text on tablet/mobile.
+import { Image } from 'astro:assets';
+import Eyebrow from './Eyebrow.astro';
+import ImageBlock from './ImageBlock.astro';
+
+const { section: s } = Astro.props;
+const TEXT_TYPES = ['context', 'process', 'goals', 'personas', 'challenge', 'philosophy', 'example'];
+const isText = TEXT_TYPES.includes(s.type);
+---
+
+{/* Standalone image(s) — full width, wider padding. */}
+{s.type === 'images' && (
+  <ImageBlock images={s.items} alt={s.alt} frame={s.frame} tiles={s.tiles} />
+)}
+
+{/* A standalone group title, e.g. "Challenges & Solutions". */}
+{s.type === 'heading' && (
+  <section class="section">
+    <h2 class="t-h3 section__grouptitle">{s.text}</h2>
+  </section>
+)}
+
+{/* All the text-based sections share the eyebrow + content two-column layout. */}
+{isText && (
+  <section class="section">
+    <div class="row">
+      <div class="row__label">
+        <Eyebrow text={s.label} />
+      </div>
+      <div class="row__content">
+        {s.type === 'context' && (
+          <p class:list={['t-body', 'rich', { 't-body--lead': s.lead }]}>{s.text}</p>
+        )}
+
+        {s.type === 'process' && (
+          <div class="block">
+            <h3 class="t-h4">{s.title}</h3>
+            <p class="t-body rich">{s.text}</p>
+          </div>
+        )}
+
+        {(s.type === 'goals' || s.type === 'personas') && (
+          <div class="block">
+            <h3 class="t-h4">{s.title}</h3>
+            <ol class="numlist">
+              {s.items.map((item: string) => (
+                <li class="t-body">{item}</li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {s.type === 'challenge' && (
+          <>
+            <div class="block">
+              <h3 class="t-h4">Challenge</h3>
+              <p class="t-body rich">{s.challenge}</p>
+            </div>
+            <div class="block">
+              <h3 class="t-h4">Solution</h3>
+              <p class="t-body rich">{s.solution}</p>
+            </div>
+          </>
+        )}
+
+        {s.type === 'philosophy' && (
+          <div class="block">
+            <h3 class="t-h4">{s.title}</h3>
+            <p class="t-body rich">{s.text}</p>
+          </div>
+        )}
+
+        {s.type === 'example' && (
+          <div class="block">
+            <h3 class="t-h4">{s.title}</h3>
+            <p class="t-body rich">{s.text}</p>
+            {s.images.length > 0 && (
+              <div class="example__images">
+                {s.images.map((img: ImageMetadata, i: number) => (
+                  <Image
+                    src={img}
+                    alt={`${s.title} — image ${i + 1}`}
+                    widths={[480, 800, 1176]}
+                    sizes="(max-width: 767px) 92vw, 780px"
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .section {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-inline: var(--pad-article);
+  }
+
+  .section__grouptitle {
+    margin: 0;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--eyebrow-gap);
+    align-items: flex-start;
+  }
+  .row__label {
+    width: var(--eyebrow-col);
+    flex-shrink: 0;
+  }
+  .row__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5); /* space between challenge/solution etc. */
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1); /* title -> body */
+  }
+
+  /* Preserve intentional line breaks written in the content file. */
+  .rich {
+    white-space: pre-line;
+  }
+
+  /* Numbered lists rendered as [1] [2] … to match the Figma style. */
+  .numlist {
+    counter-reset: n;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .numlist li {
+    display: flex;
+    gap: var(--space-1);
+  }
+  .numlist li::before {
+    counter-increment: n;
+    content: '[' counter(n) ']';
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+  }
+
+  .example__images {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+  }
+  .example__images :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-image);
+  }
+</style>

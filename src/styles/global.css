@@ -1,0 +1,131 @@
+/* =============================================================================
+   GLOBAL STYLES
+   - Loads the tokens (single source of truth)
+   - Loads the Inter font (self-hosted; no external requests)
+   - A light reset + the shared typography classes every component uses.
+   You normally won't edit this file — change values in tokens.css instead.
+============================================================================= */
+
+@import './tokens.css';
+
+/* Self-hosted Inter (variable weight). Bundled into the site at build time. */
+@import '@fontsource-variable/inter';
+
+/* ----- Reset ----------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: var(--body-line);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* page body never scrolls sideways */
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* ----- Shared typography classes (all read from tokens.css) ------------------ */
+.t-h1 {
+  font-family: var(--font-display);
+  font-size: var(--h1-size);
+  line-height: var(--h1-line);
+  letter-spacing: var(--h1-tracking);
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.t-h1-accent {
+  font-family: var(--font-display);
+  font-size: var(--h1-accent-size);
+  line-height: var(--h1-line);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.t-h3 {
+  font-family: var(--font-heading);
+  font-size: var(--h3-size);
+  line-height: var(--h3-line);
+  letter-spacing: var(--h3-tracking);
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.t-h4 {
+  font-family: var(--font-heading);
+  font-size: var(--h4-size);
+  line-height: var(--h4-line);
+  letter-spacing: var(--h4-tracking);
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: var(--body-line);
+  letter-spacing: var(--body-tracking);
+  font-weight: 400;
+}
+
+/* A slightly heavier lead paragraph (used for the project intro/context). */
+.t-body--lead {
+  font-weight: 500;
+}
+
+.t-small {
+  font-family: var(--font-body);
+  font-size: var(--small-size);
+  line-height: var(--small-line);
+  font-weight: 400;
+}
+
+.t-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--eyebrow-size);
+  line-height: var(--eyebrow-line);
+  letter-spacing: var(--eyebrow-tracking);
+  text-transform: uppercase;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.t-secondary {
+  color: var(--color-text-secondary);
+}
+
+/* Respect users who prefer reduced motion (no animations in this build anyway). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,130 @@
+---
+// PROJECT PAGE — one page per project folder. It renders the meta header,
+// the big hero image, then each section from the content file in order.
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DisciplineTag from '../../components/DisciplineTag.astro';
+import ProjectMeta from '../../components/ProjectMeta.astro';
+import ProjectSection from '../../components/ProjectSection.astro';
+import { getSortedProjects, slugForEntry } from '../../lib/projects';
+
+export async function getStaticPaths() {
+  const projects = await getSortedProjects();
+  return projects.map((entry) => ({
+    params: { slug: slugForEntry(entry) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { title, disciplines, studio, role, years, hero, sections, credits } = entry.data;
+---
+
+<BaseLayout title={`${title} / Yael Issacharov`}>
+  <article class="article">
+    <header class="phead">
+      <h1 class="t-h1 phead__title">{title}</h1>
+      <div class="phead__meta">
+        <DisciplineTag disciplines={disciplines} size="header" />
+        <ProjectMeta studio={studio} role={role} years={years} />
+        {
+          credits.length > 0 && (
+            <div class="phead__credits t-small t-secondary">
+              <span class="phead__credits-label">Other Team members on this project:</span>
+              <div class="phead__credits-list">
+                {credits.map((c) => (
+                  <span class="phead__credit">
+                    <span>{c.role} </span>
+                    <span class="phead__credit-names">{c.names}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    {
+      hero && (
+        <div class="hero-img">
+          <Image
+            src={hero}
+            alt={`${title} — hero image`}
+            widths={[600, 1000, 1280, 1600]}
+            sizes="(max-width: 767px) 92vw, 1176px"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+
+    {sections.map((section) => <ProjectSection section={section} />)}
+  </article>
+</BaseLayout>
+
+<style>
+  .article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .phead {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    width: 100%;
+    padding: var(--space-9) var(--pad-article) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .phead__title {
+    margin: 0;
+  }
+  .phead__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .phead__credits {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+  }
+  .phead__credits-list {
+    display: flex;
+    gap: var(--space-4);
+  }
+  .phead__credit-names {
+    font-style: italic;
+  }
+
+  /* Mobile/tablet: let the credits wrap and stack rather than crowd. */
+  @media (max-width: 1023px) {
+    .phead__credits {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+    .phead__credits-list {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  .hero-img {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-inline: var(--pad-bleed);
+  }
+  .hero-img :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-image);
+  }
+</style>

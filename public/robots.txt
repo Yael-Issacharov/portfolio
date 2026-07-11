@@ -1,0 +1,6 @@
+# Ask all search engines NOT to crawl or index any part of this site.
+# This keeps the portfolio out of Google/Bing results.
+# NOTE: this is a polite request, not a lock — anyone with the direct link
+# can still open the site. See the README "Privacy" section for details.
+User-agent: *
+Disallow: /

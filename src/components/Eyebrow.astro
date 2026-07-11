@@ -1,0 +1,16 @@
+---
+// The small UPPERCASE label that sits in the left margin of a project section
+// (desktop) or above it (tablet/mobile). Renders nothing if no text is given.
+interface Props {
+  text?: string;
+}
+const { text } = Astro.props;
+---
+{text && <p class="t-eyebrow eyebrow">{text}</p>}
+
+<style>
+  .eyebrow {
+    /* left label column width comes from tokens (full-width on tablet/mobile) */
+    margin: 0;
+  }
+</style>

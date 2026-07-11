@@ -1,0 +1,195 @@
+---
+// DESIGN SYSTEM — a hidden reference page (noindex, like the rest of the site).
+// It renders every design token and every component in one place so you can
+// see the whole visual language at a glance. Change a value in
+// src/styles/tokens.css, reload this page, and watch it update everywhere.
+//
+// Visit it at:  /design-system
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import DisciplineTag from '../components/DisciplineTag.astro';
+import ProjectMeta from '../components/ProjectMeta.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import ImageBlock from '../components/ImageBlock.astro';
+import ProjectSection from '../components/ProjectSection.astro';
+import Footer from '../components/Footer.astro';
+
+// Sample images (reuse the Tambour placeholders just for this preview).
+import sampleA from '../content/projects/1-tambour/images/thumbnail.jpg';
+import sampleB from '../content/projects/1-tambour/images/gallery-a.jpg';
+import sampleC from '../content/projects/1-tambour/images/gallery-b.jpg';
+
+const colors = [
+  { name: '--color-bg', label: 'Background', value: '#ffffff' },
+  { name: '--color-text', label: 'Text (primary)', value: '#000000' },
+  { name: '--color-text-secondary', label: 'Text (secondary)', value: 'rgba(0,0,0,.55)' },
+  { name: '--color-divider', label: 'Divider', value: 'rgba(0,0,0,.1)' },
+  { name: '--color-header-bg', label: 'Header bar', value: '#000000' },
+  { name: '--color-button-bg', label: 'Button fill', value: '#ffffff' },
+];
+
+const type = [
+  { cls: 't-h1', label: 'H1 — hero / project title', spec: 'Helvetica Neue · 52 · 1.1' },
+  { cls: 't-h1-accent', label: 'H1 accent — italic', spec: 'Helvetica Neue italic · 64' },
+  { cls: 't-h3', label: 'H3 — section & card titles', spec: 'Helvetica · 24 · -2%' },
+  { cls: 't-h4', label: 'H4 — sub-headings', spec: 'Helvetica · 20' },
+  { cls: 't-body', label: 'Body — paragraphs', spec: 'Inter · 18 · 1.45' },
+  { cls: 't-small', label: 'Small — meta', spec: 'Inter · 16' },
+  { cls: 't-eyebrow', label: 'Eyebrow — labels', spec: 'Inter · 16 · +2% · UPPER' },
+];
+
+const spaces = ['--space-1', '--space-2', '--space-3', '--space-4', '--space-5', '--space-6', '--space-7', '--space-8', '--space-9'];
+const radii = [
+  { name: '--radius-pill', label: 'Menu bar' },
+  { name: '--radius-image', label: 'Images / cards' },
+  { name: '--radius-button', label: 'Button' },
+];
+
+// Sample sections to preview the project-page renderer.
+const demoGoals = { type: 'goals', label: 'Numbered list', title: 'Goals', items: ['First goal item', 'Second goal item', 'Third goal item'] };
+const demoContext = { type: 'context', label: 'Project Context', lead: true, text: 'A lead paragraph of body text. This is how a "context" section reads on a project page.' };
+const demoChallenge = { type: 'challenge', label: 'A challenge', challenge: 'The challenge statement goes here.', solution: 'The solution statement goes here.' };
+const demoExample = { type: 'example', label: 'Example 01', title: 'An example title', text: 'Example body text describing the detail shown below.', images: [sampleA] };
+---
+
+<BaseLayout title="Design System / Yael Issacharov">
+  <main class="ds">
+    <header class="ds__head">
+      <p class="t-eyebrow">Internal reference · not linked publicly</p>
+      <h1 class="t-h1">Design System</h1>
+      <p class="t-body t-secondary ds__intro">
+        Everything below is generated from <code>src/styles/tokens.css</code>. Change a value
+        there, reload, and it updates across the whole site. This page is <code>noindex</code>,
+        like every other page.
+      </p>
+    </header>
+
+    <!-- COLORS -->
+    <section class="ds__section">
+      <h2 class="t-h3">Colors</h2>
+      <div class="swatches">
+        {colors.map((c) => (
+          <div class="swatch">
+            <div class="swatch__chip" style={`background: var(${c.name}); box-shadow: inset 0 0 0 1px var(--color-divider);`}></div>
+            <div>
+              <p class="t-small">{c.label}</p>
+              <p class="t-small t-secondary"><code>{c.name}</code></p>
+              <p class="t-small t-secondary">{c.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- TYPE -->
+    <section class="ds__section">
+      <h2 class="t-h3">Type scale</h2>
+      <div class="typerows">
+        {type.map((t) => (
+          <div class="typerow">
+            <span class={t.cls}>{t.label}</span>
+            <span class="t-small t-secondary typerow__spec">{t.spec}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- SPACING -->
+    <section class="ds__section">
+      <h2 class="t-h3">Spacing</h2>
+      <div class="spaces">
+        {spaces.map((s) => (
+          <div class="spacerow">
+            <code class="t-small t-secondary">{s}</code>
+            <div class="spacebar" style={`width: var(${s}); height: 16px;`}></div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- RADII -->
+    <section class="ds__section">
+      <h2 class="t-h3">Corner radii</h2>
+      <div class="radii">
+        {radii.map((r) => (
+          <div class="radiusitem">
+            <div class="radiusbox" style={`border-radius: var(${r.name});`}></div>
+            <p class="t-small t-secondary">{r.label} · <code>{r.name}</code></p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- COMPONENTS -->
+    <section class="ds__section">
+      <h2 class="t-h3">Components</h2>
+
+      <h3 class="t-h4 ds__sub">Discipline tag</h3>
+      <DisciplineTag disciplines={['Branding', 'Web Design (UX/UI)']} />
+
+      <h3 class="t-h4 ds__sub">Meta row</h3>
+      <div style="max-width:480px"><ProjectMeta studio="Moveo Creative" role="Design Lead" years="2025-2026" /></div>
+
+      <h3 class="t-h4 ds__sub">Eyebrow label</h3>
+      <Eyebrow text="A conceptual challenge" />
+
+      <h3 class="t-h4 ds__sub">Project card</h3>
+      <div class="cardpreview">
+        <ProjectCard slug="tambour" title="Tambour" disciplines={['Website Design (UX/UI)']} studio="Moveo Creative" role="Lead Designer" years="2025-2026" thumbnail={sampleA} />
+      </div>
+
+      <h3 class="t-h4 ds__sub">Image block — single</h3>
+      <ImageBlock images={[sampleB]} alt="single image example" />
+
+      <h3 class="t-h4 ds__sub">Image block — row of three</h3>
+      <ImageBlock images={[sampleA, sampleB, sampleC]} alt="row example" />
+
+      <h3 class="t-h4 ds__sub">Section — context (lead)</h3>
+      <ProjectSection section={demoContext} />
+      <h3 class="t-h4 ds__sub">Section — numbered list</h3>
+      <ProjectSection section={demoGoals} />
+      <h3 class="t-h4 ds__sub">Section — challenge / solution</h3>
+      <ProjectSection section={demoChallenge} />
+      <h3 class="t-h4 ds__sub">Section — example</h3>
+      <ProjectSection section={demoExample} />
+    </section>
+
+    <!-- FOOTER -->
+    <section class="ds__section">
+      <h2 class="t-h3">Footer</h2>
+    </section>
+    <Footer />
+  </main>
+</BaseLayout>
+
+<style>
+  .ds {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--space-9) var(--pad-article) var(--space-8);
+  }
+  .ds__head { margin-bottom: var(--space-7); display: flex; flex-direction: column; gap: var(--space-2); }
+  .ds__intro { max-width: 640px; }
+  .ds__section { margin-bottom: var(--space-8); display: flex; flex-direction: column; gap: var(--space-3); }
+  .ds__sub { margin-top: var(--space-4); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85em; }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); }
+  .swatch { display: flex; gap: var(--space-2); align-items: center; }
+  .swatch__chip { width: 56px; height: 56px; border-radius: var(--radius-image); flex-shrink: 0; }
+
+  .typerows { display: flex; flex-direction: column; gap: var(--space-3); }
+  .typerow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-2); flex-wrap: wrap; }
+  .typerow__spec { white-space: nowrap; }
+
+  .spaces { display: flex; flex-direction: column; gap: var(--space-2); }
+  .spacerow { display: flex; align-items: center; gap: var(--space-3); }
+  .spacerow code { width: 90px; flex-shrink: 0; }
+  .spacebar { background: var(--color-text); border-radius: 2px; }
+
+  .radii { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+  .radiusitem { display: flex; flex-direction: column; gap: var(--space-1); }
+  .radiusbox { width: 96px; height: 96px; background: var(--color-divider); box-shadow: inset 0 0 0 1px var(--color-divider); }
+
+  .cardpreview { max-width: 552px; }
+</style>

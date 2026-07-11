@@ -1,0 +1,79 @@
+---
+// HOME — the gallery. It builds itself from the project folders, so you never
+// edit this file to add work: just add a project folder and push.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Footer from '../components/Footer.astro';
+import { getSortedProjects, slugForEntry } from '../lib/projects';
+
+const projects = await getSortedProjects();
+---
+
+<BaseLayout title="Yael Issacharov / Portfolio">
+  <main>
+    <header class="hero">
+      <h1 class="hero__title">
+        <span class="t-h1">Yael Issacharov</span>
+        <span class="t-h1-accent">Portfolio</span>
+      </h1>
+      {/* TODO (Yael): optional short intro line here. The Figma hero text
+          ("Name / What you do…") was placeholder, so it's intentionally left out. */}
+    </header>
+
+    <section class="gallery" aria-label="Selected work">
+      {
+        projects.map((p) => (
+          <ProjectCard
+            slug={slugForEntry(p)}
+            title={p.data.title}
+            disciplines={p.data.disciplines}
+            studio={p.data.studio}
+            role={p.data.role}
+            years={p.data.years}
+            thumbnail={p.data.thumbnail}
+            featured={p.data.featured}
+          />
+        ))
+      }
+    </section>
+
+    <Footer />
+  </main>
+</BaseLayout>
+
+<style>
+  .hero {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--space-9) var(--pad-gallery) var(--space-7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero__title {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .gallery {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--pad-gallery);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-6);
+    row-gap: var(--space-7);
+  }
+  /* Featured projects span the full width of the grid (desktop). */
+  .gallery :global(.card--featured) {
+    grid-column: 1 / -1;
+  }
+
+  /* Tablet + mobile: a single column. */
+  @media (max-width: 1023px) {
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

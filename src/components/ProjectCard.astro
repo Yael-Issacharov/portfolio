@@ -1,0 +1,103 @@
+---
+// A single project on the home gallery: image, then title + disciplines,
+// then the studio / role / years meta row. The whole card links to the
+// project page. `featured` cards span the full grid width on desktop.
+import { Image } from 'astro:assets';
+import DisciplineTag from './DisciplineTag.astro';
+import ProjectMeta from './ProjectMeta.astro';
+
+interface Props {
+  slug: string;
+  title: string;
+  disciplines: string[];
+  studio: string;
+  role: string;
+  years: string;
+  thumbnail?: ImageMetadata;
+  featured?: boolean;
+}
+const { slug, title, disciplines, studio, role, years, thumbnail, featured = false } =
+  Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const href = `${base}/projects/${slug}`.replace(/\/{2,}/g, '/');
+---
+
+<a class:list={['card', { 'card--featured': featured }]} href={href}>
+  <div class="card__image">
+    {
+      thumbnail ? (
+        <Image
+          src={thumbnail}
+          alt={`${title} — project thumbnail`}
+          widths={[400, 700, 1040, 1280]}
+          sizes="(max-width: 767px) 90vw, (max-width: 1023px) 700px, 552px"
+          loading="lazy"
+        />
+      ) : (
+        <div class="card__placeholder" aria-hidden="true" />
+      )
+    }
+  </div>
+
+  <div class="card__text">
+    <div class="card__titlerow">
+      <h2 class="t-h3 card__title">{title}</h2>
+      <DisciplineTag disciplines={disciplines} size="card" />
+    </div>
+    <ProjectMeta studio={studio} role={role} years={years} />
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    border-radius: var(--radius-image);
+  }
+
+  .card__image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 552 / 414; /* 4:3, from Figma */
+    border-radius: var(--radius-image);
+    overflow: hidden;
+    background: var(--color-divider);
+  }
+  .card__image :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .card__placeholder {
+    position: absolute;
+    inset: 0;
+    background: var(--color-divider);
+  }
+
+  .card__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .card__titlerow {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .card__title {
+    margin: 0;
+  }
+
+  /* Mobile: stack the title above the disciplines. */
+  @media (max-width: 767px) {
+    .card__titlerow {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+</style>

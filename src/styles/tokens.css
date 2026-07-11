@@ -1,0 +1,173 @@
+/* =============================================================================
+   DESIGN TOKENS — the single source of truth for the whole site.
+   Every color, font, size, and spacing on every page reads from here.
+   Change a value below, reload, and it updates everywhere.
+
+   Open /design-system in your browser to see all of these rendered live.
+
+   HOW TO EDIT (see README "Editing the design" for a worked example):
+     • Colors ....... "COLORS" section below
+     • Fonts ........ "FONT FAMILIES" + "TYPE SCALE"
+     • Spacing ...... "SPACING"
+     • Corners ...... "CORNER RADII"
+   Values come straight from the Figma file — edit with care.
+============================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------------
+     COLORS
+     rgba(0,0,0,0.55) means "black at 55% opacity" — used for secondary text.
+  --------------------------------------------------------------------------- */
+  --color-bg: #ffffff;                    /* page background */
+  --color-text: #000000;                  /* primary text (titles, body) */
+  --color-text-secondary: rgba(0, 0, 0, 0.55); /* meta, captions, labels */
+  --color-divider: rgba(0, 0, 0, 0.1);    /* thin separator lines */
+  --color-frame: #e4e4e4;                  /* soft grey backdrop behind showcased images */
+
+  --color-header-bg: #000000;             /* the floating top menu bar */
+  --color-on-dark: #ffffff;               /* text/links on the black bar */
+  --color-button-bg: #ffffff;            /* "Reach Out" button fill */
+  --color-button-text: #000000;          /* "Reach Out" button text */
+
+  /* ---------------------------------------------------------------------------
+     FONT FAMILIES
+     Helvetica Neue / Helvetica are built into Mac & most systems (no download).
+     Inter is bundled with the site (self-hosted) so no external requests.
+  --------------------------------------------------------------------------- */
+  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* biggest headings (H1) */
+  --font-heading: 'Helvetica', 'Helvetica Neue', Arial, sans-serif; /* section + card titles */
+  --font-body: 'Inter Variable', 'Inter', system-ui, sans-serif;   /* body, labels, nav */
+
+  /* ---------------------------------------------------------------------------
+     TYPE SCALE  (size / line-height / letter-spacing / weight)
+     Pulled from Figma. em-based letter-spacing so it scales with size.
+  --------------------------------------------------------------------------- */
+  /* H1 — hero + project title */
+  --h1-size: 52px;
+  --h1-line: 1.1;
+  --h1-tracking: 0;
+  /* Hero accent — the italic "Portfolio" word */
+  --h1-accent-size: 64px;
+
+  /* H3 — section headings, card titles, project disciplines, footer headings */
+  --h3-size: 24px;
+  --h3-line: 1.2;
+  --h3-tracking: -0.02em; /* Figma: -2% */
+
+  /* H4 — sub-headings: Process, Goals, Challenge, Solution, example titles */
+  --h4-size: 20px;
+  --h4-line: 1.2;
+  --h4-tracking: 0;
+
+  /* Body — main paragraph text */
+  --body-size: 18px;
+  --body-line: 1.45;
+  --body-tracking: 0;
+
+  /* Small — meta (studio / role / years), secondary details */
+  --small-size: 16px;
+  --small-line: 1.45;
+
+  /* Footer headings ("My design philosophy" / "Reach out") + footer body.
+     These shrink on mobile (see the MOBILE block below). */
+  --footer-heading-size: 24px;
+  --footer-heading-tracking: -0.02em;
+  --footer-body-size: 18px;
+
+  /* Eyebrow — the small UPPERCASE labels in the left margin / above sections */
+  --eyebrow-size: 16px;
+  --eyebrow-line: 1.45;
+  --eyebrow-tracking: 0.02em; /* Figma: +2% */
+
+  /* Nav links + buttons */
+  --nav-size: 16px;
+  --nav-tracking: -0.005em; /* Figma: -0.08px @16 */
+
+  /* Company name in the floating menu */
+  --company-size: 20px;
+  --company-line: 1.4;
+  --company-tracking: -0.02em; /* Figma: -0.4px @20 */
+
+  /* ---------------------------------------------------------------------------
+     SPACING  (the rhythm of the page — gaps and padding)
+  --------------------------------------------------------------------------- */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 42px;   /* vertical gap inside project text blocks */
+  --space-6: 48px;   /* gap between cards / stacked images */
+  --space-7: 80px;
+  --space-8: 120px;
+  --space-9: 160px;  /* top space under the fixed header */
+
+  /* ---------------------------------------------------------------------------
+     LAYOUT — container width + the horizontal page padding per breakpoint.
+     The @media blocks at the bottom of this file change these three values
+     for tablet and mobile. Everything else stays in one place.
+  --------------------------------------------------------------------------- */
+  --container-max: 1280px; /* the widest the content ever gets */
+
+  --pad-gallery: 120px; /* side padding: home gallery + footer */
+  --pad-article: 100px; /* side padding: project page text */
+  --pad-bleed: 52px;    /* side padding: full-width images + header bar */
+
+  --header-pad-x: 52px; /* the floating menu bar's distance from screen edges */
+  --header-pad-y: 24px;
+  --nav-gap: 24px;      /* gap between "About" and the "Reach Out" button */
+
+  --eyebrow-col: 200px; /* width of the left label column on project pages */
+  --eyebrow-gap: 100px; /* gap between that label column and the text */
+
+  /* ---------------------------------------------------------------------------
+     CORNER RADII
+  --------------------------------------------------------------------------- */
+  --radius-image: 8px;  /* project images + cards */
+  --radius-button: 8px; /* "Reach Out" button */
+  --radius-pill: 4px;   /* the floating menu bar */
+
+  /* Effects */
+  --header-blur: 35px;  /* frosted-glass blur behind the menu bar */
+  --z-header: 100;
+}
+
+/* =============================================================================
+   BREAKPOINTS — the three layouts from Figma.
+     Desktop : 1024px and up   (frame width 1280)
+     Tablet  : 768px – 1023px  (frame width 800)
+     Mobile  : below 768px     (frame width 375)
+   Only the values that actually change between breakpoints live here.
+============================================================================= */
+
+/* TABLET */
+@media (max-width: 1023px) {
+  :root {
+    --pad-gallery: 52px;
+    --pad-article: 64px;
+    --pad-bleed: 52px;
+    --header-pad-x: 52px;
+    /* On tablet the eyebrow label sits ABOVE the text instead of beside it. */
+    --eyebrow-col: 100%;
+    --eyebrow-gap: 16px;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+  :root {
+    --pad-gallery: 24px;
+    --pad-article: 24px;
+    --pad-bleed: 24px;
+    --header-pad-x: 20px;
+    --nav-gap: 12px;
+
+    --space-7: 56px; /* tighter hero/section spacing on small screens */
+    --space-8: 40px;
+    --space-9: 120px;
+
+    /* Footer shrinks on mobile (Figma). Card titles + project body stay full size. */
+    --footer-heading-size: 18px;
+    --footer-heading-tracking: -0.02em;
+    --footer-body-size: 16px;
+  }
+}

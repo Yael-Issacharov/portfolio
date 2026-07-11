@@ -1,0 +1,37 @@
+---
+// The one-line meta row: studio | role | years (years shown in italic).
+// Used on both the gallery card and the project page header.
+interface Props {
+  studio: string;
+  role: string;
+  years: string;
+}
+const { studio, role, years } = Astro.props;
+---
+<div class="meta t-small t-secondary">
+  <span class="meta__studio">{studio}</span>
+  <span class="meta__role">{role}</span>
+  <span class="meta__years">{years}</span>
+</div>
+
+<style>
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: var(--space-2);
+  }
+  .meta__role {
+    /* keep the middle item centered between studio and years */
+    text-align: center;
+    flex: 1;
+  }
+  .meta__years {
+    font-style: italic;
+    white-space: nowrap;
+  }
+  .meta__studio {
+    white-space: nowrap;
+  }
+</style>

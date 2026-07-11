@@ -1,0 +1,33 @@
+---
+// The shell every page uses: <head> (with the noindex tags that keep the site
+// unlisted), the floating navigation, and a slot for the page content.
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Portfolio of Yael Issacharov.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- PRIVACY: keep this site out of search engines.
+         (Also enforced by public/robots.txt. See README "Privacy".) -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <Nav />
+    <slot />
+  </body>
+</html>

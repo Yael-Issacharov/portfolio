@@ -1,0 +1,28 @@
+---
+// Renders a project's discipline list, e.g. "Branding ・ Web Design (UX/UI)".
+// Multiple disciplines are joined with the "・" separator (matches Figma).
+interface Props {
+  disciplines: string[];
+  size?: 'card' | 'header'; // card = 18px; project header = 24px secondary
+}
+const { disciplines, size = 'card' } = Astro.props;
+---
+<p class:list={['tag', `tag--${size}`, 't-secondary']}>{disciplines.join('・ ')}</p>
+
+<style>
+  .tag {
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.45;
+  }
+  .tag--card {
+    font-size: var(--body-size);
+  }
+  /* On the project page the disciplines sit under the big title, larger. */
+  .tag--header {
+    font-family: var(--font-heading);
+    font-size: var(--h3-size);
+    letter-spacing: var(--h3-tracking);
+    line-height: var(--h3-line);
+  }
+</style>

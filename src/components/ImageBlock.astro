@@ -1,0 +1,108 @@
+---
+// Displays project images. Layouts:
+//   • one image            -> full width at its natural shape
+//   • several (default)    -> a centered row that keeps each image's real
+//                             shape (great for phone screenshots side by side)
+//   • several + tiles:true -> equal, evenly-cropped tiles (a uniform gallery)
+// Option `frame:true` sits everything on a soft grey showcase backdrop.
+// All images are optimized + lazy-loaded by Astro.
+import { Image } from 'astro:assets';
+
+interface Props {
+  images: ImageMetadata[];
+  alt?: string;
+  bleed?: boolean; // wider "near full-bleed" horizontal padding (default on)
+  frame?: boolean; // grey showcase backdrop
+  tiles?: boolean; // equal cropped tiles instead of natural shapes
+}
+const { images, alt = '', bleed = true, frame = false, tiles = false } = Astro.props;
+const single = images.length === 1;
+const mode = single ? 'single' : tiles ? 'tiles' : 'row';
+---
+
+<div class:list={['imgblock', { 'imgblock--bleed': bleed }]}>
+  <div class:list={['imgblock__stage', { 'is-framed': frame }]}>
+    <div class:list={['imgblock__inner', `is-${mode}`]}>
+      {
+        images.map((img, i) => (
+          <div class="imgblock__item">
+            <Image
+              src={img}
+              alt={alt || `Project image ${i + 1}`}
+              widths={[400, 800, 1176, 1600]}
+              sizes={single ? '(max-width: 767px) 92vw, 1176px' : '(max-width: 767px) 92vw, 480px'}
+              loading="lazy"
+            />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .imgblock {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-inline: var(--pad-bleed);
+  }
+
+  /* Grey showcase backdrop (the "framed" look). */
+  .imgblock__stage.is-framed {
+    background: var(--color-frame);
+    padding: var(--space-4);
+  }
+
+  /* --- single: full width, natural shape --- */
+  .is-single .imgblock__item :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-image);
+  }
+
+  /* --- row: centered, keeps each image's real shape (same height) --- */
+  .is-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+    justify-content: center;
+  }
+  .is-row .imgblock__item :global(img) {
+    height: clamp(240px, 30vw, 460px);
+    width: auto;
+    max-width: 100%;
+    border-radius: var(--radius-image);
+  }
+
+  /* --- tiles: equal, evenly-cropped columns --- */
+  .is-tiles {
+    display: flex;
+    gap: var(--space-3);
+  }
+  .is-tiles .imgblock__item {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 552 / 414;
+    border-radius: var(--radius-image);
+    overflow: hidden;
+    background: var(--color-divider);
+  }
+  .is-tiles .imgblock__item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Mobile: stack rows/tiles vertically. */
+  @media (max-width: 767px) {
+    .is-tiles {
+      flex-direction: column;
+    }
+    .is-row .imgblock__item :global(img) {
+      height: auto;
+      width: 100%;
+    }
+  }
+</style>

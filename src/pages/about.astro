@@ -1,0 +1,86 @@
+---
+// ABOUT + contact. NOTE: the Figma file only included the Home and Project
+// designs, so this page is composed from the same tokens/components (same
+// visual language). Edit your bio/philosophy and contact in src/data/site.ts.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+
+const { email, instagram, linkedin } = site.contact;
+const links = [
+  email && { label: 'Email', href: `mailto:${email}` },
+  instagram && { label: 'Instagram', href: instagram },
+  linkedin && { label: 'LinkedIn', href: linkedin },
+].filter(Boolean) as { label: string; href: string }[];
+---
+
+<BaseLayout title="About / Yael Issacharov">
+  <main class="about">
+    <header class="about__head">
+      <h1 class="t-h1">About</h1>
+    </header>
+
+    <section class="about__body">
+      <div class="row">
+        <p class="t-eyebrow row__label">{site.philosophy.title}</p>
+        <p class="t-body row__content">{site.philosophy.text}</p>
+      </div>
+    </section>
+
+    <section class="about__body" id="reach-out">
+      <div class="row">
+        <p class="t-eyebrow row__label">Reach out</p>
+        <nav class="row__content links" aria-label="Contact">
+          {
+            links.length > 0 ? (
+              links.map((l) => (
+                <a class="t-body link" href={l.href}>
+                  {l.label}
+                </a>
+              ))
+            ) : (
+              <p class="t-body t-secondary">
+                TODO: add Email / Instagram / LinkedIn in src/data/site.ts
+              </p>
+            )
+          }
+        </nav>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .about__head {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--space-9) var(--pad-article) var(--space-6);
+  }
+  .about__body {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--pad-article);
+    margin-bottom: var(--space-6);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--eyebrow-gap);
+    align-items: flex-start;
+  }
+  .row__label {
+    width: var(--eyebrow-col);
+    flex-shrink: 0;
+  }
+  .row__content {
+    flex: 1;
+    min-width: 0;
+  }
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .link:hover {
+    color: var(--color-text-secondary);
+  }
+</style>

@@ -10,9 +10,9 @@ export const site = {
   // Your contact links. Leave a value as an empty string '' to hide that link.
   // TODO: add your real email + profile URLs.
   contact: {
-    email: '', // e.g. 'hello@yaelissacharov.com'  (no "mailto:" needed)
-    instagram: '', // e.g. 'https://instagram.com/yourhandle'
-    linkedin: '', // e.g. 'https://www.linkedin.com/in/yourname'
+    email: 'yyael.is@gmail.com', // no "mailto:" needed
+    instagram: 'https://www.instagram.com/yyael.is/',
+    linkedin: 'https://www.linkedin.com/in/yael-issacharov/',
   },
 
   // The short "design philosophy" statement (footer + About page).

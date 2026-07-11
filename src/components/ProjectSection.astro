@@ -21,6 +21,15 @@ const isText = TEXT_TYPES.includes(s.type);
 {/* A grid of captioned images. */}
 {s.type === 'gallery' && <Gallery items={s.items} />}
 
+{/* A grey placeholder (e.g. where a video will go). */}
+{s.type === 'placeholder' && (
+  <div class="ph-wrap">
+    <div class="ph-box" style={`aspect-ratio: ${s.ratio};`}>
+      <span class="t-small t-secondary">{s.note}</span>
+    </div>
+  </div>
+)}
+
 {/* A standalone group title, e.g. "Challenges & Solutions". */}
 {s.type === 'heading' && (
   <section class="section">
@@ -170,6 +179,22 @@ const isText = TEXT_TYPES.includes(s.type);
   .example__images :global(img) {
     width: 100%;
     height: auto;
+    border-radius: var(--radius-image);
+  }
+
+  /* Grey placeholder box (video slot). */
+  .ph-wrap {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-inline: var(--pad-bleed);
+  }
+  .ph-box {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-frame);
     border-radius: var(--radius-image);
   }
 </style>

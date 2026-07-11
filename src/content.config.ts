@@ -84,6 +84,14 @@ const projects = defineCollection({
         images: z.array(image()).default([]),
       }),
 
+      // A grey placeholder block — marks where an asset (e.g. a video) will go.
+      z.object({
+        type: z.literal('placeholder'),
+        label,
+        ratio: z.string().default('16 / 9'), // aspect ratio of the box
+        note: z.string().default('Video'),   // small centred caption
+      }),
+
       // A grid of captioned images (each with its own caption underneath).
       z.object({
         type: z.literal('gallery'),

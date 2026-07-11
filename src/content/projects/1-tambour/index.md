@@ -9,7 +9,9 @@
 
 title: Tambour
 disciplines:
-  - "Website Design (UX/UI)"
+  - "Concept"
+  - "UX/UI Design"
+  - "Web Design"
 studio: Moveo Creative
 role: Lead Designer
 years: "2023-2026"
@@ -20,7 +22,7 @@ credits:
   - { role: "Design", names: "Nitzan Bar, Sivan Chini" }
 featured: true            # spans the full gallery width on desktop
 hero: ./images/hero.jpg
-thumbnail: ./images/thumbnail.jpg
+thumbnail: ./images/cover.jpg
 
 sections:
   # ---- Intro --------------------------------------------------------------

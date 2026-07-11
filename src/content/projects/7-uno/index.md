@@ -7,7 +7,7 @@ disciplines:
 studio: "Barner Brand"
 role: Designer
 years: "2021–2022"
-order: 7
+order: 6
 roles: ["Concept", "Product Development", "Industrial Design", "Product Management", "3D Design"]
 collaborators: ["Barner (brand)"]
 hero: ./images/hero.jpg

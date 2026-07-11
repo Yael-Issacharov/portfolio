@@ -25,8 +25,9 @@
   --color-frame: #e4e4e4;                  /* soft grey backdrop behind showcased images */
   --color-chip-bg: #f5f5f5;                /* small role/tag chips in the project header */
 
-  --color-header-bg: #000000;             /* the floating top menu bar */
+  --color-header-bg: #000000;             /* the floating top menu bar + footer */
   --color-on-dark: #ffffff;               /* text/links on the black bar */
+  --color-on-dark-muted: rgba(255, 255, 255, 0.7); /* footer contact links */
   --color-button-bg: #ffffff;            /* "Reach Out" button fill */
   --color-button-text: #000000;          /* "Reach Out" button text */
 
@@ -50,7 +51,10 @@
   /* Hero accent — the italic "Portfolio" word */
   --h1-accent-size: 64px;
 
-  /* H3 — section headings, card titles, project disciplines, footer headings */
+  /* Card title — project name on the home gallery cards */
+  --card-title-size: 32px;
+
+  /* H3 — section headings, project disciplines, footer headings */
   --h3-size: 24px;
   --h3-line: 1.2;
   --h3-tracking: -0.02em; /* Figma: -2% */
@@ -126,6 +130,7 @@
   --radius-image: 8px;  /* project images + cards */
   --radius-button: 8px; /* "Reach Out" button */
   --radius-pill: 4px;   /* the floating menu bar */
+  --radius-footer: 12px; /* rounded top corners of the black footer */
 
   /* Effects */
   --header-blur: 35px;  /* frosted-glass blur behind the menu bar */

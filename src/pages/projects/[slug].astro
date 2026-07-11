@@ -3,7 +3,6 @@
 // the big hero image, then each section from the content file in order.
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import DisciplineTag from '../../components/DisciplineTag.astro';
 import ProjectMeta from '../../components/ProjectMeta.astro';
 import ProjectSection from '../../components/ProjectSection.astro';
 import { getSortedProjects, slugForEntry } from '../../lib/projects';
@@ -26,6 +25,9 @@ const clientAgency = [
   client && `Client ${client}`,
   agency && `Agency ${agency}`,
 ].filter(Boolean).join(' · ');
+
+// Header chips: the detailed role list if present, otherwise the disciplines.
+const chips = roles.length > 0 ? roles : disciplines;
 ---
 
 <BaseLayout title={`${title} / Yael Issacharov`}>
@@ -34,7 +36,6 @@ const clientAgency = [
       <h1 class="t-h1 phead__title">{title}</h1>
       {subtitle && <p class="phead__subtitle t-secondary">{subtitle}</p>}
       <div class="phead__meta">
-        <DisciplineTag disciplines={disciplines} size="header" />
         <ProjectMeta studio={clientAgency || studio} role={role} years={years} />
         {awards.length > 0 && <p class="phead__line t-small t-secondary">Awards — {awards.join(' · ')}</p>}
         {collaborators.length > 0 && <p class="phead__line t-small t-secondary">{collaborators.join(' · ')}</p>}
@@ -55,10 +56,10 @@ const clientAgency = [
         }
       </div>
       {
-        roles.length > 0 && (
+        chips.length > 0 && (
           <div class="phead__chips">
-            {roles.map((r) => (
-              <span class="phead__chip t-small t-secondary">{r}</span>
+            {chips.map((c) => (
+              <span class="chip">{c}</span>
             ))}
           </div>
         )
@@ -117,12 +118,6 @@ const clientAgency = [
     flex-wrap: wrap;
     gap: var(--space-1);
     margin-top: var(--space-1);
-  }
-  .phead__chip {
-    background: var(--color-chip-bg);
-    border-radius: 2px;
-    padding: 6px;
-    white-space: nowrap;
   }
   .phead__meta {
     display: flex;

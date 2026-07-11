@@ -8,6 +8,7 @@ studio: HIT
 role: Designer
 years: "2019–2020"
 order: 4
+featured: true
 roles: ["Concept", "Product Development", "Industrial Design", "Terracotta Slip Casting"]
 awards: ["A'Design Award 2021", "International Design Awards (IDA) 2021"]
 collaborators: ["Renders — Francesco M. Lucini", "Images — Noa Paul"]

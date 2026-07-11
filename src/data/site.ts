@@ -7,6 +7,15 @@
 export const site = {
   authorName: 'Yael Issacharov',
 
+  // The intro line on the home page. Each item is one segment; they're shown
+  // separated by small black squares. Edit / reorder freely.
+  heroIntro: [
+    'Yael Issacharov',
+    'Multi-Disciplinary Creative Designer',
+    'Head of Design at "Moveo Creative" agency',
+    'Based in Tel Aviv.',
+  ],
+
   // Your contact links. Leave a value as an empty string '' to hide that link.
   // TODO: add your real email + profile URLs.
   contact: {

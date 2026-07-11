@@ -1,9 +1,9 @@
 ---
-// A single project on the home gallery: image, then title + disciplines,
-// then the studio / role / years meta row. The whole card links to the
-// project page. `featured` cards span the full grid width on desktop.
+// A single project on the home gallery: cover image, then the meta row
+// (studio / role / years), then the title with discipline chips.
+// The whole card links to the project page. `featured` cards span the full
+// grid width on desktop.
 import { Image } from 'astro:assets';
-import DisciplineTag from './DisciplineTag.astro';
 import ProjectMeta from './ProjectMeta.astro';
 
 interface Props {
@@ -29,9 +29,9 @@ const href = `${base}/projects/${slug}`.replace(/\/{2,}/g, '/');
       thumbnail ? (
         <Image
           src={thumbnail}
-          alt={`${title} — project thumbnail`}
-          widths={[400, 700, 1040, 1280]}
-          sizes="(max-width: 767px) 90vw, (max-width: 1023px) 700px, 552px"
+          alt={`${title} — project cover`}
+          widths={[520, 800, 1080, 1600]}
+          sizes="(max-width: 767px) 90vw, (max-width: 1023px) 700px, 1080px"
           loading="lazy"
         />
       ) : (
@@ -41,11 +41,19 @@ const href = `${base}/projects/${slug}`.replace(/\/{2,}/g, '/');
   </div>
 
   <div class="card__text">
-    <div class="card__titlerow">
-      <h2 class="t-h3 card__title">{title}</h2>
-      <DisciplineTag disciplines={disciplines} size="card" />
-    </div>
     <ProjectMeta studio={studio} role={role} years={years} />
+    <div class="card__titlerow">
+      <h2 class="t-card-title card__title">{title}</h2>
+      {
+        disciplines.length > 0 && (
+          <div class="card__chips">
+            {disciplines.map((d) => (
+              <span class="chip">{d}</span>
+            ))}
+          </div>
+        )
+      }
+    </div>
   </div>
 </a>
 
@@ -53,14 +61,14 @@ const href = `${base}/projects/${slug}`.replace(/\/{2,}/g, '/');
   .card {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-4); /* 32px between cover and text */
     border-radius: var(--radius-image);
   }
 
   .card__image {
     position: relative;
     width: 100%;
-    aspect-ratio: 552 / 414; /* 4:3, from Figma */
+    aspect-ratio: 1080 / 660; /* the cover frame, from Figma (~1.64:1) */
     border-radius: var(--radius-image);
     overflow: hidden;
     background: var(--color-divider);
@@ -81,21 +89,27 @@ const href = `${base}/projects/${slug}`.replace(/\/{2,}/g, '/');
   .card__text {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-1); /* 8px between meta row and title row */
   }
   .card__titlerow {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 20px;
     flex-wrap: wrap;
   }
   .card__title {
     margin: 0;
   }
+  .card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
 
-  /* Mobile: stack the title above the disciplines. */
+  /* Mobile: stack the title above the chips. */
   @media (max-width: 767px) {
     .card__titlerow {
+      align-items: flex-start;
       flex-direction: column;
       gap: 12px;
     }

@@ -3,11 +3,11 @@
 title: "Snap-Off Knife"
 subtitle: "Stainless-Steel & Brass Utility Knife"
 disciplines:
-  - "Industrial Design Thesis"
+  - "Industrial Design"
 studio: HIT
 role: Designer
 years: "2018"
-order: 6
+order: 7
 roles: ["Concept", "Product Development", "Industrial Design", "Material Research"]
 hero: ./images/hero.png
 thumbnail: ./images/hero.png

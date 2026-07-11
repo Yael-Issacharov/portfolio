@@ -1,5 +1,5 @@
 ---
-// The home-page footer: the "Reach out" contact links, above a thin divider.
+// The home-page footer: a black band with the "Reach out" contact links.
 // Content comes from src/data/site.ts (edit your details there).
 import { site } from '../data/site';
 
@@ -12,23 +12,19 @@ const links = [
 ---
 
 <footer class="footer" id="reach-out">
-  <div class="footer__divider" aria-hidden="true"></div>
-
-  <div class="footer__contact">
+  <div class="footer__inner">
+    <div class="footer__divider" aria-hidden="true"></div>
     <h2 class="footer__heading">Reach out</h2>
     <nav class="footer__links" aria-label="Contact">
       {
         links.length > 0 ? (
           links.map((l) => (
-            <a class="footer__link t-secondary" href={l.href}>
+            <a class="footer__link" href={l.href}>
               {l.label}
             </a>
           ))
         ) : (
-          <p class="footer__link t-secondary">
-            {/* TODO: add contact links in src/data/site.ts */}
-            TODO: add Email / Instagram / LinkedIn in src/data/site.ts
-          </p>
+          <p class="footer__link">TODO: add contact links in src/data/site.ts</p>
         )
       }
     </nav>
@@ -37,10 +33,17 @@ const links = [
 
 <style>
   .footer {
-    position: relative;
-    width: 100%;
     max-width: var(--container-max);
     margin: 0 auto;
+  }
+  .footer__inner {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-6);
+    background: var(--color-header-bg);
+    border-radius: var(--radius-footer) var(--radius-footer) 0 0;
     padding: var(--space-7) var(--pad-gallery) var(--space-8);
   }
 
@@ -50,14 +53,8 @@ const links = [
     left: var(--pad-gallery);
     right: var(--pad-gallery);
     height: 1px;
-    background: var(--color-divider);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 1px;
-  }
-
-  .footer__contact {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
   }
 
   .footer__heading {
@@ -66,21 +63,24 @@ const links = [
     font-size: var(--footer-heading-size);
     letter-spacing: var(--footer-heading-tracking);
     line-height: 1.2;
-    color: var(--color-text);
+    color: var(--color-on-dark);
   }
 
   .footer__links {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+    align-items: flex-end;
+    text-align: right;
   }
   .footer__link {
     font-family: var(--font-body);
     font-weight: 500;
     font-size: var(--footer-body-size);
     line-height: 1.45;
+    color: var(--color-on-dark-muted);
   }
   .footer__link:hover {
-    color: var(--color-text);
+    color: var(--color-on-dark);
   }
 </style>

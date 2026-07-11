@@ -122,6 +122,30 @@ ol {
   color: var(--color-text-secondary);
 }
 
+/* Card title — project name on gallery cards (Helvetica 32). */
+.t-card-title {
+  font-family: var(--font-heading);
+  font-size: var(--card-title-size);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+/* Small tag pill — used for discipline chips on cards and project headers. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-chip-bg);
+  border-radius: 2px;
+  padding: 6px;
+  font-family: var(--font-body);
+  font-size: var(--small-size);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
 /* Respect users who prefer reduced motion (no animations in this build anyway). */
 @media (prefers-reduced-motion: reduce) {
   * {

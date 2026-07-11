@@ -3,7 +3,7 @@
 title: "Marc."
 subtitle: "Ceramic Cup One-offs for Artesania Catalunya"
 disciplines:
-  - "Industrial Design Project"
+  - "Industrial Design"
 studio: "IED Barcelona"
 role: Designer
 years: "2019"

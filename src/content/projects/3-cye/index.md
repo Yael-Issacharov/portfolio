@@ -5,12 +5,15 @@
 # in the design are omitted here (Figma can't export video) — see README notes.
 title: Cye
 disciplines:
-  - "Branding"
-  - "Web Design (UX/UI)"
+  - "Concept"
+  - "Brand Design"
+  - "UX/UI Design"
+  - "Product"
 studio: Moveo
 role: Design Lead
 years: "2025-2026"
 order: 3
+featured: true
 roles: ["Concept", "Brand Design", "UX/UI Design", "Product"]
 client: "Cye"
 agency: "Moveo Creative"
@@ -140,8 +143,9 @@ sections:
       Group / multi-entity security leader (Group CISO); [4] Reseller partner,
       [5] MSSP partner. Tertiary: [6] Private-equity operating partner.
 
-  # TODO (video): a screen recording sits here in the Figma design.
-  # Drop the video file in ./images/ and tell me the name to embed it.
+  - type: placeholder
+    ratio: "2850 / 1552"
+    note: "Video — drop the screen recording in ./images/"
 
   - type: challenge
     label: "A UX challenge"
@@ -193,7 +197,9 @@ sections:
       intent and routed to the matching response, so first-time and infrequent
       visitors always have a way in.
 
-  # TODO (video): a second screen recording sits here in the Figma design.
+  - type: placeholder
+    ratio: "2850 / 1552"
+    note: "Video — drop the screen recording in ./images/"
 
   - type: images
     items: [./images/phones.png]

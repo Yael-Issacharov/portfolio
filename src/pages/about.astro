@@ -1,86 +1,335 @@
 ---
-// ABOUT + contact. NOTE: the Figma file only included the Home and Project
-// designs, so this page is composed from the same tokens/components (same
-// visual language). Edit your bio/philosophy and contact in src/data/site.ts.
+// ABOUT / RESUME — built to match the Figma "Resume" design (nodes 19:3671
+// desktop / 19:3718 tablet / 19:3765 mobile). The ONE deliberate change from
+// Figma is the horizontal padding: the site's 100px (var --pad-article)
+// instead of Figma's 240px. Content is from Yael's CV.
+//
+// To edit your resume, change the arrays below.
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../data/site';
 
+// Project cover images (reuse the project covers).
+import tambourImg from '../content/projects/1-tambour/images/cover.jpg';
+import cyeImg from '../content/projects/3-cye/images/hero.png';
+import naveImg from '../content/projects/4-nave/images/hero.png';
+
+const profile =
+  "Brand, web and product designer with an industrial-design foundation. Currently Head of Design at Moveo Creative, leading brand identities, websites and product UX/UI for B2B tech and enterprise clients. I pair strategic thinking with hands-on craft across brand systems, UX/UI, and 3D/industrial design — and hold an honors B.Des from HIT with internationally awarded work.";
+
+const projects = [
+  {
+    date: 'Moveo · 2025–2026',
+    title: 'Tambour — Website Redesign',
+    text: "Israel's largest paint and coatings brand. Restructured a cluttered site into a clear architecture across three business domains — paint, construction finishing, and drywall — and extended a new brand language into the digital experience with audience-tailored UX.",
+    image: tambourImg,
+  },
+  {
+    date: 'Moveo · 2025–2026',
+    title: 'Cye — Rebrand & Website',
+    text: 'AI-native cyber-exposure company. Full rebrand ("The Radar System") and a website reimagined as an LLM-style chat app — differentiated from ten audited competitors, with a prompt-first homepage and intent-based "Smart Search."',
+    image: cyeImg,
+  },
+  {
+    date: 'HIT Thesis · 2019–2020',
+    title: 'Nave — Terracotta Air-Conditioning System',
+    text: "Award-winning B.Des thesis: a terracotta-and-water tile system that cools desert interiors on minimal energy, reviving a traditional method as a controllable, installable green-building product. IDA Gold 2021; A'Design Bronze 2022.",
+    image: naveImg,
+  },
+];
+
+const experience = [
+  {
+    date: 'Dec 2022 – Present · Tel Aviv',
+    title: 'Head of Design — Moveo Creative',
+    text: "Lead brand, web and product design across the agency's B2B tech and enterprise accounts — Cye, Tambour, monday.com, Stratasys, Explorium, Valens, and Shlomo — owning projects end to end, from brand strategy and UX/UI to design systems and developer handoff. Progressed from Creative Designer to Design Lead to Head of Design, setting design direction and mentoring designers.",
+  },
+  {
+    date: '2021 – 2022',
+    title: 'Product Designer — Barner',
+    text: 'Designed eyewear and textile products, and created "Uno", a premium bio-acetate eyewear collection built around individual consumer personalities across two seasons (optical and sunglasses).',
+  },
+  {
+    date: '2019 – Present',
+    title: 'Freelance — Illustrator & Product Designer',
+    text: 'Commercial illustration, children\'s-book illustration, and product/craft projects — including "Marc.", a limited series of one-off ceramic cups for Artesania Catalunya, co-created with ceramist Carmen Balada (Barcelona).',
+  },
+  {
+    date: '2012 – 2014',
+    title: 'IDF — Special Medical Technological Training',
+    text: 'Produced training materials: short films, animation, print, and video-game animation.',
+  },
+];
+
+const education = [
+  {
+    date: '2016 – 2020',
+    title: 'HIT — Holon Institute of Technology · B.Des Industrial Design',
+    text: 'Graduated with honors. Dean\'s List 2018, 2019, 2020. "Excellent Thesis Project," 2020.',
+  },
+  { date: '2019', title: 'IED Barcelona · Erasmus Exchange, Product Design', text: '' },
+  { date: '2022', title: 'UX/UI Professional Course · Doron Yaakobi', text: '' },
+  {
+    date: '2008 – 2012',
+    title: 'Thelma Yellin High School of the Arts · Arts Major',
+    text: 'Full matriculation certificate with excellence.',
+  },
+];
+
+const awards = [
+  {
+    date: '2021',
+    title: 'IDA Design Awards — Gold',
+    text: 'Gold Winner (Sustainable Living / Residential; Environmental Preservation / Sustainable Design; Home Interior Products) — Nave.',
+  },
+  {
+    date: '2022',
+    title: "A'Design Award — Bronze",
+    text: 'Bronze (Building Materials & Construction Components Design) — Nave.',
+  },
+];
+
+const skills = [
+  {
+    date: '',
+    title: 'Design',
+    text: 'Brand identity · UX/UI · web design · product design · industrial design · art direction · 3D modeling & rendering · illustration · rapid prototyping.',
+  },
+  {
+    date: '',
+    title: 'Tools',
+    text: 'Figma · Adobe CC (Illustrator, Photoshop, InDesign, Premiere, Animate) · SolidWorks · Marvelous Designer · KeyShot · Wix · Notion · Asana · Slack · Google Workspace.',
+  },
+];
+
+const also = [
+  { date: '', title: 'Languages', text: 'Hebrew (native) · English (fluent) · Spanish (intermediate).' },
+  {
+    date: '',
+    title: 'Courses',
+    text: "Typography Concepts for the Screen — Gemma Busquets (2022) · Children's-Book Illustration — HIT (2019) · Practical Carpentry — Beit Yanai (2015).",
+  },
+  { date: '', title: 'Volunteer', text: 'Illustrator — Culana (כולנה) non-profit (2020).' },
+];
+
+// Text-only sections rendered with the shared row markup.
+const sections = [
+  { heading: 'Experience', rows: experience },
+  { heading: 'Education', rows: education },
+  { heading: 'Awards', rows: awards },
+  { heading: 'Skills', rows: skills },
+  { heading: 'Also', rows: also },
+];
+
 const { email, instagram, linkedin } = site.contact;
-const links = [
-  email && { label: 'Email', href: `mailto:${email}` },
-  instagram && { label: 'Instagram', href: instagram },
-  linkedin && { label: 'LinkedIn', href: linkedin },
-].filter(Boolean) as { label: string; href: string }[];
+const socials = [
+  instagram && { label: 'Instagram', href: instagram, icon: 'instagram' },
+  linkedin && { label: 'LinkedIn', href: linkedin, icon: 'linkedin' },
+  email && { label: 'Email', href: `mailto:${email}`, icon: 'mail' },
+].filter(Boolean) as { label: string; href: string; icon: string }[];
 ---
 
-<BaseLayout title="About / Yael Issacharov">
-  <main class="about">
-    <header class="about__head">
-      <h1 class="t-h1">About</h1>
+<BaseLayout title="Resume / Yael Issacharov">
+  <main class="resume">
+    <header class="resume__head">
+      <h1 class="t-h1">Resume</h1>
+      <p class="resume__profile t-body t-secondary">{profile}</p>
     </header>
 
-    <section class="about__body">
-      <div class="row">
-        <p class="t-eyebrow row__label">{site.philosophy.title}</p>
-        <p class="t-body row__content">{site.philosophy.text}</p>
-      </div>
+    {/* Projects (with images) */}
+    <section class="resume__section">
+      <h2 class="resume__h2">Projects</h2>
+      {
+        projects.map((p) => (
+          <div class="arow">
+            <div class="arow__date"><span class="t-body">{p.date}</span></div>
+            <div class="arow__body arow__body--project">
+              <div class="arow__text">
+                <p class="t-body arow__title">{p.title}</p>
+                <p class="t-body t-secondary">{p.text}</p>
+              </div>
+              <div class="arow__image">
+                <Image src={p.image} alt={p.title} widths={[480, 760, 1000]} sizes="(max-width: 1023px) 92vw, 700px" loading="lazy" />
+              </div>
+            </div>
+          </div>
+        ))
+      }
     </section>
 
-    <section class="about__body" id="reach-out">
-      <div class="row">
-        <p class="t-eyebrow row__label">Reach out</p>
-        <nav class="row__content links" aria-label="Contact">
-          {
-            links.length > 0 ? (
-              links.map((l) => (
-                <a class="t-body link" href={l.href}>
-                  {l.label}
-                </a>
-              ))
-            ) : (
-              <p class="t-body t-secondary">
-                TODO: add Email / Instagram / LinkedIn in src/data/site.ts
-              </p>
-            )
-          }
-        </nav>
-      </div>
-    </section>
+    {/* Text-only sections */}
+    {
+      sections.map((sec) => (
+        <section class="resume__section">
+          <h2 class="resume__h2">{sec.heading}</h2>
+          {sec.rows.map((r) => (
+            <div class="arow">
+              <div class="arow__date"><span class="t-body">{r.date}</span></div>
+              <div class="arow__body">
+                <div class="arow__text">
+                  <p class="t-body arow__title">{r.title}</p>
+                  {r.text && <p class="t-body t-secondary">{r.text}</p>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      ))
+    }
+
+    <footer class="resume__footer" id="reach-out">
+      <p class="resume__cta">Let’s work together</p>
+      <nav class="resume__socials" aria-label="Contact">
+        {
+          socials.map((s) => (
+            <a class="resume__social" href={s.href} aria-label={s.label} title={s.label}>
+              {s.icon === 'instagram' && (
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
+                </svg>
+              )}
+              {s.icon === 'linkedin' && (
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5zM3 9h4v12H3zM9 9h3.8v1.64h.05c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.4c0-1.29-.02-2.95-1.8-2.95-1.8 0-2.08 1.4-2.08 2.85V21H9z" />
+                </svg>
+              )}
+              {s.icon === 'mail' && (
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <path d="m4 7 8 6 8-6" />
+                </svg>
+              )}
+            </a>
+          ))
+        }
+      </nav>
+    </footer>
   </main>
 </BaseLayout>
 
 <style>
-  .about__head {
+  .resume {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding: var(--space-9) var(--pad-article) var(--space-6);
   }
-  .about__body {
-    max-width: var(--container-max);
-    margin: 0 auto;
-    padding: 0 var(--pad-article);
-    margin-bottom: var(--space-6);
-  }
-  .row {
+
+  .resume__head {
+    padding: var(--space-9) var(--pad-article) var(--space-7);
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--eyebrow-gap);
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .resume__profile {
+    max-width: 720px;
+  }
+
+  .resume__section {
+    padding: var(--space-7) var(--pad-article);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .resume__h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--color-text);
+  }
+
+  /* A resume row: date column (320px) + content. */
+  .arow {
+    display: flex;
     align-items: flex-start;
+    gap: 0;
+    width: 100%;
   }
-  .row__label {
-    width: var(--eyebrow-col);
+  .arow__date {
+    width: 320px;
     flex-shrink: 0;
+    font-style: italic;
+    color: var(--color-text-secondary);
   }
-  .row__content {
+  .arow__body {
     flex: 1;
     min-width: 0;
   }
-  .links {
+  .arow__body--project {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .arow__text {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
   }
-  .link:hover {
+  .arow__title {
+    color: var(--color-text);
+  }
+  .arow__image {
+    width: 100%;
+    aspect-ratio: 480 / 320; /* 3:2, from Figma */
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--color-divider);
+  }
+  .arow__image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .resume__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-7) var(--pad-article);
+    border-top: 1px solid var(--color-divider);
+  }
+  .resume__cta {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+  .resume__socials {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .resume__social {
+    color: var(--color-text);
+    display: inline-flex;
+  }
+  .resume__social:hover {
     color: var(--color-text-secondary);
+  }
+
+  /* Tablet + mobile: stack the date above the content (matches Figma's small
+     breakpoints). */
+  @media (max-width: 1023px) {
+    .arow {
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .arow__date {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .resume__h2,
+    .resume__cta {
+      font-size: 24px;
+    }
+    .resume__footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
   }
 </style>

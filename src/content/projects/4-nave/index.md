@@ -20,23 +20,25 @@ sections:
     lead: true
     text: >-
       Nave is a terracotta tile system combined with water flow that cools
-      indoor spaces in desert environments on minimal energy and water. The
-      cooling method revives a local traditional solution and answers a local
-      need: in the project, a generic product is transformed back into a local,
-      place-tailored one. The system comes in three variations — wall tiles, a
-      partition, and a totem (a vertical cooling body) — and is intended for
-      green building in Israel's Negev.
+      indoor spaces in desert environments on minimal energy and water. It was
+      developed as my Industrial Design Bachelor's degree thesis at HIT - Holon
+      Institute of Technology, and went on to win an A'Design Award and an
+      International Design Award (IDA) in 2021. The cooling method revives a
+      local traditional solution and answers a local need: a generic product is
+      transformed back into a local, place-tailored one. The system comes in
+      three variations — wall tiles, a partition, and a totem (a vertical
+      cooling body) - intended for green building in Israel's Negev.
 
   - type: process
     label: Process, Goals & Users
     title: Process
     text: >-
       The project ran as applied research. Technical development moved through
-      three steps: identifying a cooling principle suited to a tile format and
-      the desert; turning that principle into a controllable irrigation formula,
-      validated by material experiments; and designing a real-world method of
-      assembly. It began in October 2019 and was presented as a thesis in
-      September 2020.
+      three steps: identifying a cooling principle suited to desertic
+      environments; focusing on traditional terracotta and water cooling method
+      ,turning that principle into a controllable irrigation formula, validated
+      by material experiments; and designing a real-world method of assembly. It
+      began in October 2019 and was presented as a thesis in September 2020.
 
   - type: images
     items:
@@ -46,12 +48,13 @@ sections:
   - type: process
     title: Goals
     text: >-
-      Make the walls of a space active — cooling the people who live in it —
-      while consuming minimal energy and water. Revive a traditional desert
-      cooling method as a contemporary, controllable, installable product for
-      green building, and demonstrate that traditional solutions, lean in
-      resources by nature, can be renovated to solve present-day problems
-      sustainably.
+      Make the walls of a space active instead of passive, cooling the people
+      who live in it, while consuming minimal energy and water. Revive a
+      traditional desert cooling method as a contemporary, controllable,
+      installable product for green building, and demonstrate that traditional
+      solutions, lean in resources by nature, can be renovated to solve
+      present-day problems sustainably. TLDR- using local solutions to a local
+      problem.
 
   - type: process
     title: Users

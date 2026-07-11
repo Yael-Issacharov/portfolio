@@ -6,6 +6,7 @@
 import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
 import ImageBlock from './ImageBlock.astro';
+import Gallery from './Gallery.astro';
 
 const { section: s } = Astro.props;
 const TEXT_TYPES = ['context', 'process', 'goals', 'personas', 'challenge', 'philosophy', 'example'];
@@ -14,8 +15,11 @@ const isText = TEXT_TYPES.includes(s.type);
 
 {/* Standalone image(s) — full width, wider padding. */}
 {s.type === 'images' && (
-  <ImageBlock images={s.items} alt={s.alt} frame={s.frame} tiles={s.tiles} />
+  <ImageBlock images={s.items} alt={s.alt} caption={s.caption} frame={s.frame} tiles={s.tiles} />
 )}
+
+{/* A grid of captioned images. */}
+{s.type === 'gallery' && <Gallery items={s.items} />}
 
 {/* A standalone group title, e.g. "Challenges & Solutions". */}
 {s.type === 'heading' && (

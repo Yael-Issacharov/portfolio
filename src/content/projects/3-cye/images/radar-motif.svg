@@ -1,0 +1,39 @@
+<svg viewBox="0 0 1240 320" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="1240" height="320" fill="#ffffff"/>
+  <text x="60" y="52" font-size="14" letter-spacing="3" fill="#9aa0a6">CYE — THE RADAR SYSTEM</text>
+  <text x="60" y="86" font-size="24" font-weight="700" fill="#1f2937">Scan · Identify · Understand · Act</text>
+
+  <!-- radar rings -->
+  <g transform="translate(230,200)">
+    <circle r="96" fill="none" stroke="#e2e5e9" stroke-width="1.5"/>
+    <circle r="64" fill="none" stroke="#e2e5e9" stroke-width="1.5"/>
+    <circle r="32" fill="none" stroke="#e2e5e9" stroke-width="1.5"/>
+    <line x1="-96" y1="0" x2="96" y2="0" stroke="#eef0f2"/>
+    <line x1="0" y1="-96" x2="0" y2="96" stroke="#eef0f2"/>
+    <path d="M0 0 L90 -34 A96 96 0 0 1 96 0 Z" fill="#39869022"/>
+    <circle cx="60" cy="-40" r="5" fill="#398690"/>
+    <circle cx="-34" cy="52" r="4" fill="#cf88eb"/>
+    <circle cx="70" cy="30" r="4" fill="#eeee6c"/>
+  </g>
+
+  <!-- steps -->
+  <g font-family="Inter, Helvetica, Arial, sans-serif">
+    <g transform="translate(430,120)">
+      <text x="0" y="0" font-size="17" font-weight="700" fill="#1f2937">Scan</text>
+      <text x="0" y="24" font-size="13.5" fill="#5f6368">the entire attack surface</text>
+    </g>
+    <g transform="translate(430,180)">
+      <text x="0" y="0" font-size="17" font-weight="700" fill="#1f2937">Identify</text>
+      <text x="0" y="24" font-size="13.5" fill="#5f6368">the risks that actually matter</text>
+    </g>
+    <g transform="translate(770,120)">
+      <text x="0" y="0" font-size="17" font-weight="700" fill="#1f2937">Understand</text>
+      <text x="0" y="24" font-size="13.5" fill="#5f6368">exposure in business terms</text>
+    </g>
+    <g transform="translate(770,180)">
+      <text x="0" y="0" font-size="17" font-weight="700" fill="#1f2937">Act</text>
+      <text x="0" y="24" font-size="13.5" fill="#5f6368">on the right next step</text>
+    </g>
+  </g>
+  <text x="430" y="250" font-size="13" fill="#8a9099">Tagline: "The Right Action" — clarity as the ultimate defense in a landscape of cyber noise.</text>
+</svg>

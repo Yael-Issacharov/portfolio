@@ -11,16 +11,17 @@ import { Image } from 'astro:assets';
 interface Props {
   images: ImageMetadata[];
   alt?: string;
+  caption?: string; // optional caption shown under the image(s)
   bleed?: boolean; // wider "near full-bleed" horizontal padding (default on)
   frame?: boolean; // grey showcase backdrop
   tiles?: boolean; // equal cropped tiles instead of natural shapes
 }
-const { images, alt = '', bleed = true, frame = false, tiles = false } = Astro.props;
+const { images, alt = '', caption = '', bleed = true, frame = false, tiles = false } = Astro.props;
 const single = images.length === 1;
 const mode = single ? 'single' : tiles ? 'tiles' : 'row';
 ---
 
-<div class:list={['imgblock', { 'imgblock--bleed': bleed }]}>
+<figure class:list={['imgblock', { 'imgblock--bleed': bleed }]}>
   <div class:list={['imgblock__stage', { 'is-framed': frame }]}>
     <div class:list={['imgblock__inner', `is-${mode}`]}>
       {
@@ -38,7 +39,8 @@ const mode = single ? 'single' : tiles ? 'tiles' : 'row';
       }
     </div>
   </div>
-</div>
+  {caption && <figcaption class="imgblock__caption t-small t-secondary">{caption}</figcaption>}
+</figure>
 
 <style>
   .imgblock {
@@ -46,6 +48,9 @@ const mode = single ? 'single' : tiles ? 'tiles' : 'row';
     max-width: var(--container-max);
     margin: 0 auto;
     padding-inline: var(--pad-bleed);
+  }
+  .imgblock__caption {
+    margin-top: var(--space-1);
   }
 
   /* Grey showcase backdrop (the "framed" look). */

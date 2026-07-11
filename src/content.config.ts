@@ -84,6 +84,21 @@ const projects = defineCollection({
         images: z.array(image()).default([]),
       }),
 
+      // A grid of captioned images (each with its own caption underneath).
+      z.object({
+        type: z.literal('gallery'),
+        label,
+        items: z
+          .array(
+            z.object({
+              image: image(),
+              alt: z.string().default(''),
+              caption: z.string().default(''),
+            })
+          )
+          .min(1),
+      }),
+
       // One or more images on their own.
       //   1 image   -> shown full width
       //   2 or more -> shown side by side in a centered row (keeps each
@@ -98,6 +113,7 @@ const projects = defineCollection({
         label,
         items: z.array(image()).min(1),
         alt: z.string().default(''),
+        caption: z.string().default(''),
         frame: z.boolean().default(false),
         tiles: z.boolean().default(false),
       }),
@@ -106,11 +122,19 @@ const projects = defineCollection({
     return z.object({
       // ----- Meta (shown on the card + at the top of the project page) -----
       title: z.string(),
+      subtitle: z.string().optional(),   // a descriptive line under the title (project page)
       disciplines: z.array(z.string()), // e.g. ["Website Design (UX/UI)", "Branding"]
       studio: z.string(),
-      role: z.string(),
+      role: z.string(),                  // short role for the card + meta row
       years: z.string(),                 // e.g. "2025-2026" or "Ongoing"
       order: z.number(),                 // gallery order (1 = first)
+
+      // Optional richer header details (shown only on the project page).
+      roles: z.array(z.string()).default([]),        // detailed role breakdown
+      awards: z.array(z.string()).default([]),       // e.g. ["A'Design Award 2021"]
+      collaborators: z.array(z.string()).default([]),// e.g. ["Carmen Balada (ceramist)"]
+      client: z.string().optional(),
+      agency: z.string().optional(),
 
       // Optional extra collaborators, shown under the meta on the project page.
       // e.g. - { role: "PM", names: "Dana Even Zahav, Shay Segal" }

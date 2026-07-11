@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1240 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="1240" height="360" fill="#ffffff"/>
+  <text x="60" y="60" font-size="15" letter-spacing="3" fill="#9aa0a6">SNAP-OFF KNIFE — MATERIALS &amp; MECHANISM</text>
+  <text x="60" y="96" font-size="26" font-weight="700" fill="#1f2937">Two metals, one smooth action</text>
+
+  <!-- schematic knife body -->
+  <rect x="120" y="170" width="820" height="60" rx="30" fill="#e9ecef"/>
+  <rect x="120" y="170" width="470" height="60" rx="30" fill="#d7dbe0"/>
+  <rect x="900" y="185" width="220" height="30" rx="6" fill="#cfa14b"/>
+  <text x="1010" y="206" font-size="13" font-weight="700" fill="#3f3413" text-anchor="middle">replaceable blade</text>
+
+  <!-- callout 1: stainless steel -->
+  <line x1="300" y1="170" x2="300" y2="120" stroke="#c4c9cf" stroke-width="1.5"/>
+  <circle cx="300" cy="120" r="4" fill="#1f2937"/>
+  <text x="300" y="104" font-size="15" font-weight="700" fill="#1f2937" text-anchor="middle">Stainless steel</text>
+  <text x="300" y="86" font-size="13" fill="#5f6368" text-anchor="middle">body — form, weight, finish</text>
+
+  <!-- callout 2: brass slider -->
+  <line x1="640" y1="230" x2="640" y2="285" stroke="#c4c9cf" stroke-width="1.5"/>
+  <circle cx="640" cy="285" r="4" fill="#cfa14b"/>
+  <text x="640" y="312" font-size="15" font-weight="700" fill="#1f2937" text-anchor="middle">Brass slider</text>
+  <text x="640" y="332" font-size="13" fill="#5f6368" text-anchor="middle">low friction on steel → smooth, controlled movement</text>
+
+  <!-- caption -->
+  <text x="120" y="270" font-size="13" fill="#8a9099">An everyday tool, elevated: metal explored as form, composition, colour and weight.</text>
+</svg>

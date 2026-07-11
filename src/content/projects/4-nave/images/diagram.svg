@@ -1,0 +1,46 @@
+<svg viewBox="0 0 1240 380" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="1240" height="380" fill="#ffffff"/>
+  <text x="60" y="60" font-size="15" letter-spacing="3" fill="#9aa0a6">NAVE — TECHNICAL RESEARCH</text>
+  <text x="60" y="96" font-size="26" font-weight="700" fill="#1f2937">From a traditional method to a controlled system</text>
+
+  <!-- connector line -->
+  <line x1="180" y1="230" x2="1060" y2="230" stroke="#e2e5e9" stroke-width="2"/>
+
+  <!-- Step 1 -->
+  <g>
+    <circle cx="180" cy="230" r="26" fill="#1f2937"/>
+    <text x="180" y="238" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+    <text x="180" y="292" font-size="17" font-weight="700" fill="#1f2937" text-anchor="middle">Cooling principle</text>
+    <text x="180" y="318" font-size="13.5" fill="#5f6368" text-anchor="middle">Find a tile-format,</text>
+    <text x="180" y="337" font-size="13.5" fill="#5f6368" text-anchor="middle">desert-fit, energy-lean</text>
+    <text x="180" y="356" font-size="13.5" fill="#5f6368" text-anchor="middle">cooling method</text>
+  </g>
+
+  <!-- Step 2 -->
+  <g>
+    <circle cx="620" cy="230" r="26" fill="#1f2937"/>
+    <text x="620" y="238" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+    <text x="620" y="292" font-size="17" font-weight="700" fill="#1f2937" text-anchor="middle">Irrigation formula</text>
+    <text x="620" y="318" font-size="13.5" fill="#5f6368" text-anchor="middle">Turn it into a water</text>
+    <text x="620" y="337" font-size="13.5" fill="#5f6368" text-anchor="middle">formula, validated by</text>
+    <text x="620" y="356" font-size="13.5" fill="#5f6368" text-anchor="middle">tile experiments</text>
+  </g>
+
+  <!-- Step 3 -->
+  <g>
+    <circle cx="1060" cy="230" r="26" fill="#1f2937"/>
+    <text x="1060" y="238" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+    <text x="1060" y="292" font-size="17" font-weight="700" fill="#1f2937" text-anchor="middle">Assembly method</text>
+    <text x="1060" y="318" font-size="13.5" fill="#5f6368" text-anchor="middle">Design a real install,</text>
+    <text x="1060" y="337" font-size="13.5" fill="#5f6368" text-anchor="middle">built on construction-</text>
+    <text x="1060" y="356" font-size="13.5" fill="#5f6368" text-anchor="middle">trade techniques</text>
+  </g>
+
+  <!-- arrowheads -->
+  <polygon points="392,224 404,230 392,236" fill="#c4c9cf"/>
+  <polygon points="832,224 844,230 832,236" fill="#c4c9cf"/>
+
+  <!-- outcome pill -->
+  <rect x="440" y="150" width="360" height="40" rx="20" fill="#f1f3f5"/>
+  <text x="620" y="176" font-size="14" fill="#1f2937" text-anchor="middle">Result: a precise, installable green-building product</text>
+</svg>

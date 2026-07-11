@@ -1,0 +1,72 @@
+---
+// A responsive grid of captioned images (each image with its own caption).
+// Used for the "Gallery" section at the end of a case study.
+import { Image } from 'astro:assets';
+
+interface Item {
+  image: ImageMetadata;
+  alt?: string;
+  caption?: string;
+}
+interface Props {
+  items: Item[];
+}
+const { items } = Astro.props;
+---
+
+<div class="gallery-block">
+  <div class="gallery-grid">
+    {
+      items.map((it) => (
+        <figure class="gallery-item">
+          <div class="gallery-item__frame">
+            <Image
+              src={it.image}
+              alt={it.alt || it.caption || 'Gallery image'}
+              widths={[400, 700, 1000]}
+              sizes="(max-width: 767px) 92vw, 560px"
+              loading="lazy"
+            />
+          </div>
+          {it.caption && <figcaption class="t-small t-secondary">{it.caption}</figcaption>}
+        </figure>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .gallery-block {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-inline: var(--pad-bleed);
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6) var(--space-4);
+  }
+  .gallery-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .gallery-item__frame {
+    width: 100%;
+    border-radius: var(--radius-image);
+    overflow: hidden;
+    background: var(--color-frame);
+  }
+  .gallery-item__frame :global(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 767px) {
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

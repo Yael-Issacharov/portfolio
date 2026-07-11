@@ -17,16 +17,29 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { title, disciplines, studio, role, years, hero, sections, credits } = entry.data;
+const {
+  title, subtitle, disciplines, studio, role, years, hero, sections, credits,
+  roles, awards, collaborators, client, agency,
+} = entry.data;
+
+const clientAgency = [
+  client && `Client ${client}`,
+  agency && `Agency ${agency}`,
+].filter(Boolean).join(' · ');
 ---
 
 <BaseLayout title={`${title} / Yael Issacharov`}>
   <article class="article">
     <header class="phead">
       <h1 class="t-h1 phead__title">{title}</h1>
+      {subtitle && <p class="phead__subtitle t-secondary">{subtitle}</p>}
       <div class="phead__meta">
         <DisciplineTag disciplines={disciplines} size="header" />
         <ProjectMeta studio={studio} role={role} years={years} />
+        {roles.length > 0 && <p class="phead__line t-small t-secondary">{roles.join(' · ')}</p>}
+        {awards.length > 0 && <p class="phead__line t-small t-secondary">Awards — {awards.join(' · ')}</p>}
+        {collaborators.length > 0 && <p class="phead__line t-small t-secondary">{collaborators.join(' · ')}</p>}
+        {clientAgency && <p class="phead__line t-small t-secondary">{clientAgency}</p>}
         {
           credits.length > 0 && (
             <div class="phead__credits t-small t-secondary">
@@ -82,6 +95,15 @@ const { title, disciplines, studio, role, years, hero, sections, credits } = ent
   }
   .phead__title {
     margin: 0;
+  }
+  .phead__subtitle {
+    font-family: var(--font-heading);
+    font-size: var(--h4-size);
+    line-height: var(--h4-line);
+    margin-top: calc(-1 * var(--space-1));
+  }
+  .phead__line {
+    width: 100%;
   }
   .phead__meta {
     display: flex;

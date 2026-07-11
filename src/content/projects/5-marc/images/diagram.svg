@@ -1,0 +1,34 @@
+<svg viewBox="0 0 1240 360" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="1240" height="360" fill="#ffffff"/>
+  <text x="60" y="60" font-size="15" letter-spacing="3" fill="#9aa0a6">MARC. — FROM WORD TO OBJECT</text>
+  <text x="60" y="96" font-size="26" font-weight="700" fill="#1f2937">One idea — "frame" — carried into a cup</text>
+
+  <!-- card 1 -->
+  <rect x="60" y="150" width="320" height="150" rx="14" fill="#fafbfc" stroke="#e2e5e9" stroke-width="1.5"/>
+  <text x="90" y="192" font-size="14" letter-spacing="2" fill="#8a9099">THE WORD</text>
+  <text x="90" y="228" font-size="22" font-weight="700" fill="#1f2937">Marc = "frame"</text>
+  <text x="90" y="258" font-size="14" fill="#5f6368">A structure that surrounds</text>
+  <text x="90" y="278" font-size="14" fill="#5f6368">something — like a window.</text>
+
+  <!-- card 2 -->
+  <rect x="460" y="150" width="320" height="150" rx="14" fill="#fafbfc" stroke="#e2e5e9" stroke-width="1.5"/>
+  <text x="490" y="192" font-size="14" letter-spacing="2" fill="#8a9099">THE TEXT</text>
+  <text x="490" y="228" font-size="22" font-weight="700" fill="#1f2937">Brossa &amp; time</text>
+  <text x="490" y="258" font-size="14" fill="#5f6368">Wording frames the page;</text>
+  <text x="490" y="278" font-size="14" fill="#5f6368">clay "remembers" its making.</text>
+
+  <!-- card 3 -->
+  <rect x="860" y="150" width="320" height="150" rx="14" fill="#1f2937"/>
+  <text x="890" y="192" font-size="14" letter-spacing="2" fill="#9aa0a6">THE OBJECT</text>
+  <text x="890" y="228" font-size="22" font-weight="700" fill="#ffffff">Framed glaze</text>
+  <text x="890" y="258" font-size="14" fill="#c4c9cf">Traditional green glaze at the</text>
+  <text x="890" y="278" font-size="14" fill="#c4c9cf">cup's center — a "mark of time".</text>
+
+  <!-- arrows -->
+  <polygon points="410,220 426,225 410,230" fill="#c4c9cf"/>
+  <polygon points="810,220 826,225 810,230" fill="#c4c9cf"/>
+  <line x1="380" y1="225" x2="404" y2="225" stroke="#e2e5e9" stroke-width="2"/>
+  <line x1="780" y1="225" x2="804" y2="225" stroke="#e2e5e9" stroke-width="2"/>
+
+  <text x="60" y="338" font-size="13" fill="#8a9099">Co-created with ceramist Carmen Balada · 6 wheel-thrown one-offs · local stoneware</text>
+</svg>

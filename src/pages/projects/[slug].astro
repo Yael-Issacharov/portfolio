@@ -35,15 +35,13 @@ const clientAgency = [
       {subtitle && <p class="phead__subtitle t-secondary">{subtitle}</p>}
       <div class="phead__meta">
         <DisciplineTag disciplines={disciplines} size="header" />
-        <ProjectMeta studio={studio} role={role} years={years} />
-        {roles.length > 0 && <p class="phead__line t-small t-secondary">{roles.join(' · ')}</p>}
+        <ProjectMeta studio={clientAgency || studio} role={role} years={years} />
         {awards.length > 0 && <p class="phead__line t-small t-secondary">Awards — {awards.join(' · ')}</p>}
         {collaborators.length > 0 && <p class="phead__line t-small t-secondary">{collaborators.join(' · ')}</p>}
-        {clientAgency && <p class="phead__line t-small t-secondary">{clientAgency}</p>}
         {
           credits.length > 0 && (
             <div class="phead__credits t-small t-secondary">
-              <span class="phead__credits-label">Other Team members on this project:</span>
+              <span class="phead__credits-label">Team members:</span>
               <div class="phead__credits-list">
                 {credits.map((c) => (
                   <span class="phead__credit">
@@ -56,6 +54,15 @@ const clientAgency = [
           )
         }
       </div>
+      {
+        roles.length > 0 && (
+          <div class="phead__chips">
+            {roles.map((r) => (
+              <span class="phead__chip t-small t-secondary">{r}</span>
+            ))}
+          </div>
+        )
+      }
     </header>
 
     {
@@ -104,6 +111,18 @@ const clientAgency = [
   }
   .phead__line {
     width: 100%;
+  }
+  .phead__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-1);
+  }
+  .phead__chip {
+    background: var(--color-chip-bg);
+    border-radius: 2px;
+    padding: 6px;
+    white-space: nowrap;
   }
   .phead__meta {
     display: flex;

@@ -1,6 +1,5 @@
 ---
-// The home-page footer: a "design philosophy" blurb on the left and the
-// "Reach out" contact links on the right, above a thin divider.
+// The home-page footer: the "Reach out" contact links, above a thin divider.
 // Content comes from src/data/site.ts (edit your details there).
 import { site } from '../data/site';
 
@@ -14,11 +13,6 @@ const links = [
 
 <footer class="footer" id="reach-out">
   <div class="footer__divider" aria-hidden="true"></div>
-
-  <div class="footer__about">
-    <h2 class="footer__heading">{site.philosophy.title}</h2>
-    <p class="footer__body t-secondary">{site.philosophy.text}</p>
-  </div>
 
   <div class="footer__contact">
     <h2 class="footer__heading">Reach out</h2>
@@ -44,9 +38,6 @@ const links = [
 <style>
   .footer {
     position: relative;
-    display: flex;
-    gap: var(--space-6);
-    align-items: flex-start;
     width: 100%;
     max-width: var(--container-max);
     margin: 0 auto;
@@ -63,17 +54,10 @@ const links = [
     border-radius: 1px;
   }
 
-  .footer__about,
   .footer__contact {
-    flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-  }
-  .footer__contact {
-    align-items: flex-end;
-    text-align: right;
   }
 
   .footer__heading {
@@ -83,22 +67,12 @@ const links = [
     letter-spacing: var(--footer-heading-tracking);
     line-height: 1.2;
     color: var(--color-text);
-    width: 100%;
-  }
-
-  .footer__body {
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: var(--footer-body-size);
-    line-height: 1.45;
   }
 
   .footer__links {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    width: 100%;
-    align-items: flex-end;
   }
   .footer__link {
     font-family: var(--font-body);
@@ -108,26 +82,5 @@ const links = [
   }
   .footer__link:hover {
     color: var(--color-text);
-  }
-
-  /* Mobile: stack, centered (matches Figma). */
-  @media (max-width: 767px) {
-    .footer {
-      flex-direction: column;
-      gap: var(--space-6);
-      padding: var(--space-8) var(--pad-gallery);
-    }
-    .footer__divider {
-      left: var(--pad-gallery);
-      right: var(--pad-gallery);
-    }
-    .footer__about,
-    .footer__contact {
-      align-items: center;
-      text-align: center;
-    }
-    .footer__links {
-      align-items: center;
-    }
   }
 </style>

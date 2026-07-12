@@ -134,6 +134,7 @@ const projects = defineCollection({
       disciplines: z.array(z.string()), // e.g. ["Website Design (UX/UI)", "Branding"]
       studio: z.string(),
       role: z.string(),                  // short role for the card + meta row
+      roleNote: z.string().optional(),   // e.g. a role-progression note on the project page
       years: z.string(),                 // e.g. "2025-2026" or "Ongoing"
       order: z.number(),                 // gallery order (1 = first)
 

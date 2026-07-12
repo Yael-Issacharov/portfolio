@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const {
-  title, subtitle, disciplines, studio, role, years, hero, sections, credits,
+  title, subtitle, disciplines, studio, role, roleNote, years, hero, sections, credits,
   roles, awards, collaborators, client, agency,
 } = entry.data;
 
@@ -37,6 +37,7 @@ const chips = roles.length > 0 ? roles : disciplines;
       {subtitle && <p class="phead__subtitle t-secondary">{subtitle}</p>}
       <div class="phead__meta">
         <ProjectMeta studio={clientAgency || studio} role={role} years={years} />
+        {roleNote && <p class="phead__line t-small t-secondary">Role — {roleNote}</p>}
         {awards.length > 0 && <p class="phead__line t-small t-secondary">Awards — {awards.join(' · ')}</p>}
         {collaborators.length > 0 && <p class="phead__line t-small t-secondary">{collaborators.join(' · ')}</p>}
         {

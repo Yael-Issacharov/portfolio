@@ -1,0 +1,229 @@
+---
+// PRINT / LANDSCAPE VIEW — every project rendered as 1920×1080 landscape pages
+// in the Tambour layout, for importing into Figma with html.to.design.
+//
+// Page 1 per project = the opener (title, chips, meta, team, hero, context +
+// process/goals blocks). Then one page per content group (challenge / example
+// + its images). Specs taken from the Tambour pages in Figma (File 2).
+//
+// Hidden + noindex. Not linked from anywhere. Visit /print/ to import.
+import { Image } from 'astro:assets';
+import { getSortedProjects } from '../lib/projects';
+
+const projects = await getSortedProjects();
+
+type Sec = any;
+// Group the body sections into pages: the opener takes the first text blocks;
+// everything after is chunked so each "lead" section carries its images.
+function paginate(sections: Sec[]) {
+  const openerBlocks: Sec[] = [];
+  const rest: Sec[] = [];
+  let seenLead = false;
+  for (const s of sections) {
+    const isText = ['process', 'goals', 'personas'].includes(s.type);
+    if (!seenLead && (isText || s.type === 'context')) {
+      if (s.type !== 'context') openerBlocks.push(s);
+      continue;
+    }
+    seenLead = true;
+    rest.push(s);
+  }
+  // chunk `rest` into pages: a lead (heading/challenge/example) starts a page,
+  // images/galleries attach to the current page.
+  const pages: Sec[][] = [];
+  let cur: Sec[] = [];
+  for (const s of rest) {
+    const isLead = ['heading', 'challenge', 'example', 'process'].includes(s.type);
+    if (isLead && cur.length) { pages.push(cur); cur = []; }
+    cur.push(s);
+  }
+  if (cur.length) pages.push(cur);
+  return { openerBlocks, pages };
+}
+
+const docs = projects.map((p) => {
+  const d: any = p.data;
+  const ctx = (d.sections || []).find((s: Sec) => s.type === 'context');
+  const { openerBlocks, pages } = paginate(d.sections || []);
+  const studioLine =
+    [d.client && `Client ${d.client}`, d.agency && `Agency ${d.agency}`].filter(Boolean).join(' · ') ||
+    d.studio;
+  return { d, ctx, openerBlocks, pages, studioLine };
+});
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Print — Yael Issacharov</title>
+    <style is:global>
+      @font-face {
+        font-family: 'InterV';
+        font-style: normal;
+        font-weight: 100 900;
+        src: url('/portfolio/fonts/inter-latin-wght-normal.woff2') format('woff2');
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #e9e9e9; font-family: 'Inter', 'InterV', Helvetica, Arial, sans-serif; }
+      .sheet {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        background: #fff;
+        overflow: hidden;
+        margin: 0 auto 40px;
+      }
+      /* ---- opener ---- */
+      .p-title {
+        position: absolute; left: 43px; top: 32px;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-weight: 300; font-size: 100px; line-height: 1; color: #262626; white-space: nowrap;
+      }
+      .p-chips { position: absolute; left: 43px; top: 165px; display: flex; flex-wrap: wrap; gap: 8px; width: 700px; }
+      .chip {
+        background: #f5f5f5; border-radius: 2px; padding: 5px 6px 6.19px;
+        font-size: 20px; line-height: 23.2px; color: rgba(0,0,0,0.55); white-space: nowrap;
+      }
+      .p-meta { position: absolute; left: 505px; top: 117px; width: 460px; display: flex; flex-direction: column; gap: 14px; }
+      .p-meta span { font-size: 17.5px; line-height: 20.3px; color: rgba(0,0,0,0.55); }
+      .p-meta .yr { font-style: italic; }
+      .p-team { position: absolute; left: 1283px; top: 87px; width: 620px; display: flex; flex-direction: column; gap: 12px; }
+      .p-team span { font-size: 17.5px; line-height: 20.3px; color: rgba(0,0,0,0.55); }
+      .p-team i { font-style: italic; }
+      .p-hero { position: absolute; left: 32px; top: 282px; width: 1224px; height: 688.5px; border-radius: 8px; overflow: hidden; background: #eee; }
+      .p-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .p-col { position: absolute; left: 1283px; width: 588px; }
+      .t-eyebrow { font-size: 16px; line-height: 23.2px; letter-spacing: 0.32px; text-transform: uppercase; color: rgba(0,0,0,0.55); }
+      .t-body { font-size: 18px; line-height: 26.1px; color: #000; font-weight: 500; white-space: pre-line; }
+      .t-h4 { font-family: 'Helvetica', Arial, sans-serif; font-size: 20px; line-height: 24px; color: #000; }
+      .t-small { font-size: 16px; line-height: 1.3; color: #000; }
+      .blocks { display: flex; flex-direction: column; gap: 28px; }
+      .block { display: flex; flex-direction: column; gap: 10px; }
+      /* ---- footer ---- */
+      .f-l, .f-r {
+        position: absolute; top: 1020px;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 20px; line-height: 1.4; color: #262626;
+      }
+      .f-l { left: 32px; } .f-r { left: 501px; }
+      /* ---- content pages ---- */
+      .c-left { position: absolute; left: 32px; top: 96px; width: 1224px; height: 900px; display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center; }
+      .c-left img { max-width: 100%; max-height: 860px; object-fit: contain; border-radius: 8px; display: block; }
+      .c-left .two { display: flex; gap: 16px; align-items: center; justify-content: center; width: 100%; }
+      .c-left .two img { max-height: 820px; }
+      .c-right { position: absolute; left: 1283px; top: 96px; width: 588px; display: flex; flex-direction: column; gap: 24px; }
+      .cs-title { font-family: 'Helvetica', Arial, sans-serif; font-size: 24px; line-height: 1.2; letter-spacing: -0.48px; color: #000; }
+      .cap { font-size: 14px; line-height: 1.3; color: rgba(0,0,0,0.55); }
+      .ph { width: 100%; height: 420px; background: #e4e4e4; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.45); font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    {
+      docs.map(({ d, ctx, openerBlocks, pages, studioLine }) => (
+        <>
+          {/* ---------- opener ---------- */}
+          <section class="sheet">
+            <div class="p-title">{d.title}</div>
+            <div class="p-chips">
+              {(d.roles?.length ? d.roles : d.disciplines).map((c: string) => (
+                <span class="chip">{c}</span>
+              ))}
+            </div>
+            <div class="p-meta">
+              <span>{studioLine}</span>
+              <span>{d.role}</span>
+              <span class="yr">{d.years}</span>
+            </div>
+            {d.credits?.length > 0 && (
+              <div class="p-team">
+                <span>Team members:</span>
+                {d.credits.map((c: any) => (
+                  <span>{c.role} <i>{c.names}</i></span>
+                ))}
+              </div>
+            )}
+            {d.hero && (
+              <div class="p-hero">
+                <Image src={d.hero} alt={`${d.title} hero`} widths={[1224, 1600]} sizes="1224px" />
+              </div>
+            )}
+            {ctx && (
+              <div class="p-col" style="top:287px">
+                <div class="t-eyebrow" style="margin-bottom:20px">{ctx.label || 'Project Context'}</div>
+                <div class="t-body">{ctx.text}</div>
+              </div>
+            )}
+            {openerBlocks.length > 0 && (
+              <div class="p-col blocks" style="top:591px">
+                {openerBlocks.map((b: Sec) => (
+                  <div class="block">
+                    <div class="t-h4">{b.title || b.label}</div>
+                    {b.text && <div class="t-small">{b.text}</div>}
+                    {b.items && <div class="t-small">{b.items.map((i: string, n: number) => `[${n + 1}] ${i}`).join('; ')}</div>}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div class="f-l">Yael Issacharov</div>
+            <div class="f-r">ID N.205789159</div>
+          </section>
+
+          {/* ---------- content pages ---------- */}
+          {pages.map((group: Sec[]) => {
+            const imgs = group.filter((s) => s.type === 'images' || s.type === 'gallery');
+            const txt = group.filter((s) => !['images', 'gallery'].includes(s.type));
+            return (
+              <section class="sheet">
+                <div class="c-left">
+                  {imgs.map((s: Sec) =>
+                    s.type === 'gallery' ? (
+                      <div class="two">
+                        {s.items.slice(0, 2).map((it: any) => (
+                          <Image src={it.image} alt={it.alt || ''} widths={[600, 1000]} sizes="600px" />
+                        ))}
+                      </div>
+                    ) : s.items.length > 1 ? (
+                      <div class="two">
+                        {s.items.slice(0, 3).map((im: any) => (
+                          <Image src={im} alt={s.alt || ''} widths={[400, 800]} sizes="400px" />
+                        ))}
+                      </div>
+                    ) : (
+                      <Image src={s.items[0]} alt={s.alt || ''} widths={[800, 1224]} sizes="1224px" />
+                    )
+                  )}
+                  {group.some((s) => s.type === 'placeholder') && <div class="ph">Video</div>}
+                </div>
+                <div class="c-right">
+                  {txt.map((s: Sec) => (
+                    <>
+                      {s.type === 'heading' && <div class="cs-title">{s.text}</div>}
+                      {s.label && s.type !== 'heading' && <div class="t-eyebrow">{s.label}</div>}
+                      {s.type === 'challenge' && (
+                        <>
+                          <div class="block"><div class="t-h4">Challenge</div><div class="t-small">{s.challenge}</div></div>
+                          <div class="block"><div class="t-h4">Solution</div><div class="t-small">{s.solution}</div></div>
+                        </>
+                      )}
+                      {(s.type === 'example' || s.type === 'process') && (
+                        <div class="block">
+                          <div class="t-h4">{s.title}</div>
+                          {s.text && <div class="t-small">{s.text}</div>}
+                          {s.items && <div class="t-small">{s.items.map((i: string, n: number) => `[${n + 1}] ${i}`).join('; ')}</div>}
+                        </div>
+                      )}
+                    </>
+                  ))}
+                  {imgs.map((s: Sec) => s.caption && <div class="cap">{s.caption}</div>)}
+                </div>
+                <div class="f-l">Yael Issacharov</div>
+                <div class="f-r">ID N.205789159</div>
+              </section>
+            );
+          })}
+        </>
+      ))
+    }
+  </body>
+</html>

@@ -1,0 +1,34 @@
+---
+// One normalised text block on a /print sheet. Kept in its own component so the
+// same markup serves the split, text-only and continuation layouts.
+// `cont` marks a block that was split across sheets — its label/title were
+// already printed on the previous sheet.
+const { b } = Astro.props;
+---
+
+{b.kind === 'heading' ? (
+  <div class="cs-title">{b.text}</div>
+) : b.kind === 'captions' ? (
+  <div class="caps">
+    {b.captions.map((c: string) => <div class="cap">{c}</div>)}
+  </div>
+) : (
+  <div class="block">
+    {b.label && <div class="t-eyebrow">{b.label}</div>}
+    {b.kind === 'challenge' ? (
+      <>
+        <div class="block"><div class="t-h4">Challenge</div><div class="t-small">{b.challenge}</div></div>
+        <div class="block" style="margin-top:28px"><div class="t-h4">Solution</div><div class="t-small">{b.solution}</div></div>
+      </>
+    ) : (
+      <>
+        {b.kind === 'context' && !b.title && <div class="t-body">{b.text}</div>}
+        {b.title && <div class="t-h4">{b.title}{b.cont && ' (cont.)'}</div>}
+        {b.kind !== 'context' && b.text && <div class="t-small">{b.text}</div>}
+        {b.items && (
+          <div class="t-small">{b.items.map((x: string, n: number) => `[${n + 1}] ${x}`).join('; ')}</div>
+        )}
+      </>
+    )}
+  </div>
+)}

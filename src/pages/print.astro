@@ -1,55 +1,434 @@
 ---
-// PRINT / LANDSCAPE VIEW — every project rendered as 1920×1080 landscape pages
+// PRINT / LANDSCAPE VIEW — every project rendered as 1920×1080 landscape sheets
 // in the Tambour layout, for importing into Figma with html.to.design.
 //
-// Page 1 per project = the opener (title, chips, meta, team, hero, context +
-// process/goals blocks). Then one page per content group (challenge / example
-// + its images). Specs taken from the Tambour pages in Figma (File 2).
+// Nothing here is hand-placed: every sheet is composed at build time from the
+// project's real content and the real pixel dimensions of every image, so no
+// image is ever cropped, scaled past legibility, or silently dropped.
+//
+// Composition rules:
+//   • The body sections are normalised into a stream of text blocks and image
+//     blocks, then walked into "runs" (a text run plus the images that follow).
+//   • Each run is chunked to fit: text that exceeds the column continues onto
+//     another sheet, images that can't be shown large enough continue too.
+//   • A sheet picks one of three layouts so a column is never left empty:
+//       split      — images left, text right   (both present)
+//       text-only  — text in two wide columns  (no images in this run)
+//       image-only — images across full width  (image continuation sheets)
+//
+// Every image is loaded eagerly: the importer captures the whole document at
+// once, so lazy images below the fold would arrive as empty boxes.
 //
 // Hidden + noindex. Not linked from anywhere. Visit /print/ to import.
+import '@fontsource-variable/inter';
 import { Image } from 'astro:assets';
 import { getSortedProjects } from '../lib/projects';
+import TextBlockView from '../components/PrintTextBlock.astro';
 
 const projects = await getSortedProjects();
 
-type Sec = any;
-// Group the body sections into pages: the opener takes the first text blocks;
-// everything after is chunked so each "lead" section carries its images.
-function paginate(sections: Sec[]) {
-  const openerBlocks: Sec[] = [];
-  const rest: Sec[] = [];
-  let seenLead = false;
-  for (const s of sections) {
-    const isText = ['process', 'goals', 'personas'].includes(s.type);
-    if (!seenLead && (isText || s.type === 'context')) {
-      if (s.type !== 'context') openerBlocks.push(s);
-      continue;
-    }
-    seenLead = true;
-    rest.push(s);
-  }
-  // chunk `rest` into pages: a lead (heading/challenge/example) starts a page,
-  // images/galleries attach to the current page.
-  const pages: Sec[][] = [];
-  let cur: Sec[] = [];
-  for (const s of rest) {
-    const isLead = ['heading', 'challenge', 'example', 'process'].includes(s.type);
-    if (isLead && cur.length) { pages.push(cur); cur = []; }
-    cur.push(s);
-  }
-  if (cur.length) pages.push(cur);
-  return { openerBlocks, pages };
+// ---------------------------------------------------------------- geometry
+const BAND_TOP = 96;
+const BAND_H = 888; // 96 → 984, clear of the 1020 footer
+const IMG_X = 32;
+const IMG_W = 1224;
+const TXT_X = 1283;
+const TXT_W = 588;
+const FULL_X = 32;
+const FULL_W = 1856;
+const WIDE_W = 888; // one of the two columns on a text-only sheet
+const WIDE_X2 = 992;
+const GAP = 16;
+
+// Opener: the hero box and the two right-hand text slots.
+// The meta column starts at x=505, so the title and chips get the band from
+// x=43 up to a gutter before it — the Figma spec assumed short titles and few
+// chips, and long ones used to run straight over the meta text.
+const HEAD_W = 505 - 43 - 24;
+const CHIPS_Y = 165;
+const CHIP_H = 34.4; // 23.2 line-height + 5 / 6.19 padding
+const CHIP_GAP = 8;
+const TITLE_SIZE = 100;
+const HERO_BOX_W = 1224;
+const HERO_Y = 282;
+const HERO_BOTTOM = 970.5;
+const OPENER_CTX_Y = 287;
+const OPENER_BLOCKS_Y = 591;
+const OPENER_BLOCKS_H = 984 - OPENER_BLOCKS_Y;
+
+// ------------------------------------------------------------ text measuring
+// Rough but conservative line-count estimate. Inter's average advance for mixed
+// case sits near 0.5em; 0.53 is deliberately pessimistic so we over-estimate
+// height and break early rather than overflow a sheet.
+const CHAR_FACTOR = 0.53;
+
+function lineCount(text: string, width: number, fontSize: number) {
+  const cpl = Math.max(8, Math.floor(width / (fontSize * CHAR_FACTOR)));
+  return String(text)
+    .split('\n')
+    .reduce((n, line) => n + Math.max(1, Math.ceil(line.trim().length / cpl)), 0);
 }
 
+type TextBlock = any;
+
+// Height a normalised text block occupies at a given column width.
+function measure(b: TextBlock, w: number): number {
+  let h = 0;
+  if (b.kind === 'heading') return lineCount(b.text, w, 24) * 28.8;
+  if (b.label) h += 23.2 + 12;
+  if (b.kind === 'context') {
+    h += 20 + lineCount(b.text, w, 18) * 26.1;
+    return h;
+  }
+  if (b.kind === 'challenge') {
+    h += lineCount('Challenge', w, 20) * 24 + 10 + lineCount(b.challenge, w, 16) * 20.8;
+    h += 28;
+    h += lineCount('Solution', w, 20) * 24 + 10 + lineCount(b.solution, w, 16) * 20.8;
+    return h;
+  }
+  if (b.title) h += lineCount(b.title, w, 20) * 24 + 10;
+  if (b.text) h += lineCount(b.text, w, 16) * 20.8;
+  if (b.items) h += lineCount(b.items.join('; '), w, 16) * 20.8;
+  return h;
+}
+
+// Split a block whose text is too tall for one column into sequential parts,
+// breaking on paragraph then sentence boundaries so nothing is ever truncated.
+function splitBlock(b: TextBlock, w: number, h: number): TextBlock[] {
+  const body: string = b.text || (b.items ? b.items.join('; ') : '');
+  if (!body || measure(b, w) <= h) return [b];
+
+  const atoms = body.split(/\n{2,}/).flatMap((p) => p.match(/[^.!?]+[.!?]*\s*/g) || [p]);
+  const parts: TextBlock[] = [];
+  let cur = '';
+  let first = true;
+  for (const atom of atoms) {
+    const next = cur ? cur + atom : atom;
+    const probe = { ...b, items: undefined, text: next, label: first ? b.label : undefined, title: first ? b.title : undefined };
+    if (cur && measure(probe, w) > h) {
+      parts.push({ ...b, items: undefined, text: cur.trim(), label: first ? b.label : undefined, title: first ? b.title : undefined, cont: !first });
+      first = false;
+      cur = atom;
+    } else {
+      cur = next;
+    }
+  }
+  if (cur.trim()) parts.push({ ...b, items: undefined, text: cur.trim(), label: first ? b.label : undefined, title: first ? b.title : undefined, cont: !first });
+  return parts;
+}
+
+// Greedily fill columns of height `h` with blocks, splitting where needed.
+function chunkText(blocks: TextBlock[], w: number, h: number, gap = 28): TextBlock[][] {
+  const chunks: TextBlock[][] = [];
+  let cur: TextBlock[] = [];
+  let used = 0;
+  for (const raw of blocks) {
+    for (const b of splitBlock(raw, w, h)) {
+      const bh = measure(b, w);
+      const add = cur.length ? gap + bh : bh;
+      if (cur.length && used + add > h) {
+        chunks.push(cur);
+        cur = [b];
+        used = bh;
+      } else {
+        cur.push(b);
+        used += add;
+      }
+    }
+  }
+  if (cur.length) chunks.push(cur);
+  return chunks.length ? chunks : [[]];
+}
+
+// ----------------------------------------------------------- image layouts
+type Img = { src: any; alt: string; ar: number };
+
+// Every way to cut n images into contiguous rows of at most `maxPerRow`.
+function partitions(n: number, maxPerRow = 4): number[][][] {
+  const out: number[][][] = [];
+  const rec = (start: number, acc: number[][]) => {
+    if (start === n) {
+      out.push(acc.map((r) => r.slice()));
+      return;
+    }
+    for (let end = start + 1; end <= Math.min(n, start + maxPerRow); end++) {
+      acc.push([start, end]);
+      rec(end, acc);
+      acc.pop();
+    }
+  };
+  rec(0, []);
+  return out;
+}
+
+// Justified rows: each row fills the column width, then the whole stack is
+// uniformly scaled down (k) if it is taller than the band. k === 1 means the
+// images run at full width; a low k means they had to shrink a lot to fit.
+// Picks the partition that renders the greatest total image area.
+function layoutImages(imgs: Img[], W: number, H: number) {
+  let best: any = null;
+  for (const part of partitions(imgs.length)) {
+    const rows = part.map(([s, e]) => imgs.slice(s, e));
+    const natural = rows.map((r) => {
+      const sumAr = r.reduce((a, i) => a + i.ar, 0);
+      return (W - GAP * (r.length - 1)) / sumAr;
+    });
+    // The gaps between rows are fixed, so only the image heights may scale:
+    // k must be measured against the height left over once gaps are removed.
+    const gaps = GAP * (rows.length - 1);
+    const sumNat = natural.reduce((a, b) => a + b, 0);
+    const k = Math.min(1, (H - gaps) / sumNat);
+    const heights = natural.map((x) => x * k);
+    const area = rows.reduce(
+      (a, r, i) => a + r.reduce((s, im) => s + heights[i] * im.ar * heights[i], 0),
+      0
+    );
+    if (!best || area > best.area) {
+      best = {
+        area,
+        k,
+        rows: rows.map((r, i) => ({
+          h: heights[i],
+          items: r.map((im) => ({ ...im, w: heights[i] * im.ar, h: heights[i] })),
+        })),
+      };
+    }
+  }
+  return best;
+}
+
+// Split images across sheets so none is scaled below `minK` of its justified
+// size. Nothing is ever dropped — the remainder continues on the next sheet.
+const MIN_K = 0.62;
+
+// Split into exactly n contiguous, near-equal groups (used to spread a run's
+// images across all of its text sheets so none is left with a blank column).
+function splitEven<T>(arr: T[], n: number): T[][] {
+  const base = Math.floor(arr.length / n);
+  const rem = arr.length % n;
+  const out: T[][] = [];
+  let i = 0;
+  for (let g = 0; g < n; g++) {
+    const take = base + (g < rem ? 1 : 0);
+    if (take) out.push(arr.slice(i, i + take));
+    i += take;
+  }
+  return out;
+}
+
+function chunkImages(imgs: Img[], W: number, H: number) {
+  const chunks: any[] = [];
+  let rest = imgs.slice();
+  while (rest.length) {
+    let n = rest.length;
+    let lay = layoutImages(rest.slice(0, n), W, H);
+    while (n > 1 && lay.k < MIN_K) {
+      n--;
+      lay = layoutImages(rest.slice(0, n), W, H);
+    }
+    chunks.push({ layout: lay });
+    rest = rest.slice(n);
+  }
+  return chunks;
+}
+
+// --------------------------------------------------------------- normalise
+const TEXTY = ['heading', 'context', 'process', 'goals', 'personas', 'philosophy', 'challenge', 'example'];
+
+function toImgs(items: any[], alt: string): Img[] {
+  return items.map((im: any) => {
+    const src = im.image ?? im;
+    return {
+      src,
+      alt: im.alt || alt || '',
+      ar: src.width && src.height ? src.width / src.height : 1.5,
+    };
+  });
+}
+
+// Flatten a project body into an ordered stream of text / image / placeholder.
+function normalise(sections: any[]) {
+  const stream: any[] = [];
+  for (const s of sections) {
+    if (s.type === 'images') {
+      stream.push({ kind: 'images', imgs: toImgs(s.items, s.alt), caption: s.caption, label: s.label });
+    } else if (s.type === 'gallery') {
+      stream.push({
+        kind: 'images',
+        imgs: toImgs(s.items, ''),
+        captions: s.items.map((i: any) => i.caption).filter(Boolean),
+        label: s.label,
+      });
+    } else if (s.type === 'placeholder') {
+      // A placeholder is laid out exactly like an image of the same aspect
+      // ratio, so it can never be sized independently of the sheet it's on.
+      const [pw, ph] = String(s.ratio).split('/').map((x: string) => parseFloat(x));
+      stream.push({
+        kind: 'images',
+        imgs: [{ ph: true, note: s.note || 'Video', ar: pw && ph ? pw / ph : 16 / 9 }],
+        caption: '',
+        label: s.label,
+      });
+    } else if (TEXTY.includes(s.type)) {
+      stream.push({ kind: s.type, ...s });
+      // `example` carries its own images — they follow the text it belongs to.
+      if (s.type === 'example' && s.images?.length) {
+        stream.push({ kind: 'images', imgs: toImgs(s.images, s.title), caption: '' });
+      }
+    }
+  }
+  return stream;
+}
+
+// Walk the stream into runs. A run is a group of text blocks plus the images
+// that follow them; a heading always starts a fresh run, and images always
+// close one.
+function toRuns(stream: any[]) {
+  const runs: any[] = [];
+  let cur: any = { texts: [], imgs: [], captions: [] };
+  const flush = () => {
+    if (cur.texts.length || cur.imgs.length) runs.push(cur);
+    cur = { texts: [], imgs: [], captions: [] };
+  };
+  for (const b of stream) {
+    if (b.kind === 'images') {
+      cur.imgs.push(...b.imgs);
+      if (b.caption) cur.captions.push(b.caption);
+      if (b.captions) cur.captions.push(...b.captions);
+    } else if (b.kind === 'heading') {
+      // A heading only starts a new sheet once the current one has images to
+      // show; otherwise it would strand its text on a near-empty sheet away
+      // from the images it introduces.
+      if (cur.imgs.length) flush();
+      cur.texts.push(b);
+    } else {
+      // A text block after images belongs to the next sheet, not this one.
+      if (cur.imgs.length) flush();
+      cur.texts.push(b);
+    }
+  }
+  flush();
+  return runs;
+}
+
+// ------------------------------------------------------------- build sheets
 const docs = projects.map((p) => {
   const d: any = p.data;
-  const ctx = (d.sections || []).find((s: Sec) => s.type === 'context');
-  const { openerBlocks, pages } = paginate(d.sections || []);
+  const stream = normalise(d.sections || []);
+
+  // The opener absorbs the first context block plus any text blocks that come
+  // before the first heading or image, as long as they fit its bottom slot.
+  const ctx = stream.find((b) => b.kind === 'context');
+  const lead: any[] = [];
+  let i = 0;
+  if (stream[0]?.kind === 'context') i = 1;
+  while (i < stream.length && ['process', 'goals', 'personas', 'philosophy'].includes(stream[i].kind)) {
+    lead.push(stream[i]);
+    i++;
+  }
+  const leadChunks = chunkText(lead, TXT_W, OPENER_BLOCKS_H);
+  const openerBlocks = leadChunks[0];
+  // Anything that didn't fit the opener is pushed back into the body.
+  const spill = leadChunks.slice(1).flat();
+  const rest = [...spill, ...stream.filter((b, n) => n >= i && b !== ctx)];
+
+  const sheets: any[] = [];
+  for (const run of toRuns(rest)) {
+    const hasImgs = run.imgs.length > 0;
+    const capBlocks = run.captions.length
+      ? [{ kind: 'captions', captions: run.captions }]
+      : [];
+
+    if (!hasImgs) {
+      // Text-only: split across two wide columns so no column sits empty.
+      const cols = chunkText(run.texts, WIDE_W, BAND_H);
+      for (let c = 0; c < cols.length; c += 2) {
+        sheets.push({ layout: 'text-only', colA: cols[c], colB: cols[c + 1] || [] });
+      }
+      continue;
+    }
+
+    const textChunks = chunkText([...run.texts, ...capBlocks], TXT_W, BAND_H);
+    let imgChunks = run.imgs.length ? chunkImages(run.imgs, IMG_W, BAND_H) : [];
+    // If the text needs more sheets than the images do, re-spread the images
+    // over every sheet rather than crowding sheet one and blanking the rest.
+    if (run.imgs.length && imgChunks.length < textChunks.length) {
+      imgChunks = splitEven(run.imgs, textChunks.length).map((g) => ({
+        layout: layoutImages(g, IMG_W, BAND_H),
+      }));
+    }
+    const n = Math.max(textChunks.length, imgChunks.length, 1);
+
+    for (let s = 0; s < n; s++) {
+      const t = textChunks[s];
+      const im = imgChunks[s];
+
+      if (im) {
+        if (t) {
+          sheets.push({ layout: 'split', texts: t, img: im });
+        } else {
+          // Image continuation — re-flow across the full sheet width.
+          const wide = layoutImages(
+            im.layout.rows.flatMap((r: any) => r.items),
+            FULL_W,
+            BAND_H
+          );
+          sheets.push({ layout: 'image-only', img: { layout: wide } });
+        }
+      } else if (t) {
+        const cols = chunkText(t, WIDE_W, BAND_H);
+        sheets.push({ layout: 'text-only', colA: cols[0], colB: cols[1] || [] });
+      }
+    }
+  }
+
+  // --- opener header: keep the title and chips inside their band ---
+  const chips: string[] = d.roles?.length ? d.roles : d.disciplines;
+  // A title longer than the band shrinks rather than running over the meta.
+  const titleSize = Math.min(TITLE_SIZE, HEAD_W / (d.title.length * 0.5));
+  // Wrap the chips the way flex-wrap will, to learn how many rows they take.
+  let chipRows = 1;
+  let rowW = 0;
+  for (const c of chips) {
+    const w = c.length * 20 * CHAR_FACTOR + 12;
+    const next = rowW ? rowW + CHIP_GAP + w : w;
+    if (rowW && next > HEAD_W) {
+      chipRows++;
+      rowW = w;
+    } else rowW = next;
+  }
+  const chipsBottom = CHIPS_Y + chipRows * CHIP_H + (chipRows - 1) * CHIP_GAP;
+  // The hero keeps its bottom edge and yields from the top if the chips need
+  // the room, so extra chips can never push it into the footer.
+  const heroTop = Math.max(HERO_Y, chipsBottom + 16);
+  const heroBoxH = HERO_BOTTOM - heroTop;
+
+  // Fit the hero to its real aspect ratio inside the hero box — never crop.
+  let hero = null;
+  if (d.hero) {
+    const ar = d.hero.width / d.hero.height;
+    let w = HERO_BOX_W;
+    let h = w / ar;
+    if (h > heroBoxH) {
+      h = heroBoxH;
+      w = h * ar;
+    }
+    hero = {
+      src: d.hero,
+      w,
+      h,
+      x: IMG_X + (HERO_BOX_W - w) / 2,
+      y: heroTop + (heroBoxH - h) / 2,
+    };
+  }
+
   const studioLine =
     [d.client && `Client ${d.client}`, d.agency && `Agency ${d.agency}`].filter(Boolean).join(' · ') ||
     d.studio;
-  return { d, ctx, openerBlocks, pages, studioLine };
+
+  return { d, ctx, openerBlocks, sheets, studioLine, hero, chips, titleSize };
 });
+
 ---
 
 <html lang="en">
@@ -58,14 +437,10 @@ const docs = projects.map((p) => {
     <meta name="robots" content="noindex, nofollow" />
     <title>Print — Yael Issacharov</title>
     <style is:global>
-      @font-face {
-        font-family: 'InterV';
-        font-style: normal;
-        font-weight: 100 900;
-        src: url('/portfolio/fonts/inter-latin-wght-normal.woff2') format('woff2');
-      }
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #e9e9e9; font-family: 'Inter', 'InterV', Helvetica, Arial, sans-serif; }
+      /* Same self-hosted Inter the rest of the site uses (imported above), so
+         the sheets measure and read exactly like the live pages. */
+      body { background: #e9e9e9; font-family: 'Inter Variable', 'Inter', system-ui, sans-serif; }
       .sheet {
         position: relative;
         width: 1920px;
@@ -75,12 +450,15 @@ const docs = projects.map((p) => {
         margin: 0 auto 40px;
       }
       /* ---- opener ---- */
+      /* The title and chips stay inside the band left of the meta column;
+         font-size is computed per project so a long title never overlaps it. */
       .p-title {
         position: absolute; left: 43px; top: 32px;
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-weight: 300; font-size: 100px; line-height: 1; color: #262626; white-space: nowrap;
+        font-weight: 300; line-height: 1; color: #262626;
+        width: 438px; white-space: nowrap;
       }
-      .p-chips { position: absolute; left: 43px; top: 165px; display: flex; flex-wrap: wrap; gap: 8px; width: 700px; }
+      .p-chips { position: absolute; left: 43px; top: 165px; display: flex; flex-wrap: wrap; gap: 8px; width: 438px; }
       .chip {
         background: #f5f5f5; border-radius: 2px; padding: 5px 6px 6.19px;
         font-size: 20px; line-height: 23.2px; color: rgba(0,0,0,0.55); white-space: nowrap;
@@ -91,15 +469,16 @@ const docs = projects.map((p) => {
       .p-team { position: absolute; left: 1283px; top: 87px; width: 620px; display: flex; flex-direction: column; gap: 12px; }
       .p-team span { font-size: 17.5px; line-height: 20.3px; color: rgba(0,0,0,0.55); }
       .p-team i { font-style: italic; }
-      .p-hero { position: absolute; left: 32px; top: 282px; width: 1224px; height: 688.5px; border-radius: 8px; overflow: hidden; background: #eee; }
-      .p-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .p-hero { position: absolute; border-radius: 8px; overflow: hidden; background: #eee; }
+      .p-hero img { width: 100%; height: 100%; display: block; }
       .p-col { position: absolute; left: 1283px; width: 588px; }
       .t-eyebrow { font-size: 16px; line-height: 23.2px; letter-spacing: 0.32px; text-transform: uppercase; color: rgba(0,0,0,0.55); }
       .t-body { font-size: 18px; line-height: 26.1px; color: #000; font-weight: 500; white-space: pre-line; }
       .t-h4 { font-family: 'Helvetica', Arial, sans-serif; font-size: 20px; line-height: 24px; color: #000; }
-      .t-small { font-size: 16px; line-height: 1.3; color: #000; }
+      .t-small { font-size: 16px; line-height: 1.3; color: #000; white-space: pre-line; }
       .blocks { display: flex; flex-direction: column; gap: 28px; }
       .block { display: flex; flex-direction: column; gap: 10px; }
+      .block + .block { margin-top: 0; }
       /* ---- footer ---- */
       .f-l, .f-r {
         position: absolute; top: 1020px;
@@ -107,28 +486,26 @@ const docs = projects.map((p) => {
         font-size: 20px; line-height: 1.4; color: #262626;
       }
       .f-l { left: 32px; } .f-r { left: 501px; }
-      /* ---- content pages ---- */
-      .c-left { position: absolute; left: 32px; top: 96px; width: 1224px; height: 900px; display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center; }
-      .c-left img { max-width: 100%; max-height: 860px; object-fit: contain; border-radius: 8px; display: block; }
-      .c-left .two { display: flex; gap: 16px; align-items: center; justify-content: center; width: 100%; }
-      .c-left .two img { max-height: 820px; }
-      .c-right { position: absolute; left: 1283px; top: 96px; width: 588px; display: flex; flex-direction: column; gap: 24px; }
+      /* ---- content sheets ---- */
+      .col { position: absolute; top: 96px; display: flex; flex-direction: column; gap: 28px; }
+      .imgstack { position: absolute; top: 96px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+      .imgrow { display: flex; gap: 16px; align-items: flex-start; justify-content: center; }
+      .imgrow img { display: block; border-radius: 8px; object-fit: cover; }
       .cs-title { font-family: 'Helvetica', Arial, sans-serif; font-size: 24px; line-height: 1.2; letter-spacing: -0.48px; color: #000; }
       .cap { font-size: 14px; line-height: 1.3; color: rgba(0,0,0,0.55); }
-      .ph { width: 100%; height: 420px; background: #e4e4e4; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.45); font-size: 16px; }
+      .caps { display: flex; flex-direction: column; gap: 6px; }
+      .ph { border-radius: 8px; background: #e4e4e4; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.45); font-size: 16px; }
     </style>
   </head>
   <body>
     {
-      docs.map(({ d, ctx, openerBlocks, pages, studioLine }) => (
+      docs.map(({ d, ctx, openerBlocks, sheets, studioLine, hero, chips, titleSize }) => (
         <>
           {/* ---------- opener ---------- */}
           <section class="sheet">
-            <div class="p-title">{d.title}</div>
+            <div class="p-title" style={`font-size:${titleSize}px`}>{d.title}</div>
             <div class="p-chips">
-              {(d.roles?.length ? d.roles : d.disciplines).map((c: string) => (
-                <span class="chip">{c}</span>
-              ))}
+              {chips.map((c: string) => <span class="chip">{c}</span>)}
             </div>
             <div class="p-meta">
               <span>{studioLine}</span>
@@ -143,24 +520,34 @@ const docs = projects.map((p) => {
                 ))}
               </div>
             )}
-            {d.hero && (
-              <div class="p-hero">
-                <Image src={d.hero} alt={`${d.title} hero`} widths={[1224, 1600]} sizes="1224px" />
+            {hero && (
+              <div
+                class="p-hero"
+                style={`left:${hero.x}px; top:${hero.y}px; width:${hero.w}px; height:${hero.h}px`}
+              >
+                <Image
+                  src={hero.src}
+                  alt={`${d.title} hero`}
+                  widths={[Math.round(hero.w), Math.round(hero.w * 2)]}
+                  sizes={`${Math.round(hero.w)}px`}
+                  loading="eager"
+                  decoding="sync"
+                />
               </div>
             )}
             {ctx && (
-              <div class="p-col" style="top:287px">
+              <div class="p-col" style={`top:${OPENER_CTX_Y}px`}>
                 <div class="t-eyebrow" style="margin-bottom:20px">{ctx.label || 'Project Context'}</div>
                 <div class="t-body">{ctx.text}</div>
               </div>
             )}
             {openerBlocks.length > 0 && (
-              <div class="p-col blocks" style="top:591px">
-                {openerBlocks.map((b: Sec) => (
+              <div class="p-col blocks" style={`top:${OPENER_BLOCKS_Y}px`}>
+                {openerBlocks.map((b: any) => (
                   <div class="block">
-                    <div class="t-h4">{b.title || b.label}</div>
+                    {b.title && <div class="t-h4">{b.title}</div>}
                     {b.text && <div class="t-small">{b.text}</div>}
-                    {b.items && <div class="t-small">{b.items.map((i: string, n: number) => `[${n + 1}] ${i}`).join('; ')}</div>}
+                    {b.items && <div class="t-small">{b.items.map((x: string, n: number) => `[${n + 1}] ${x}`).join('; ')}</div>}
                   </div>
                 ))}
               </div>
@@ -169,59 +556,59 @@ const docs = projects.map((p) => {
             <div class="f-r">ID N.205789159</div>
           </section>
 
-          {/* ---------- content pages ---------- */}
-          {pages.map((group: Sec[]) => {
-            const imgs = group.filter((s) => s.type === 'images' || s.type === 'gallery');
-            const txt = group.filter((s) => !['images', 'gallery'].includes(s.type));
-            return (
-              <section class="sheet">
-                <div class="c-left">
-                  {imgs.map((s: Sec) =>
-                    s.type === 'gallery' ? (
-                      <div class="two">
-                        {s.items.slice(0, 2).map((it: any) => (
-                          <Image src={it.image} alt={it.alt || ''} widths={[600, 1000]} sizes="600px" />
-                        ))}
-                      </div>
-                    ) : s.items.length > 1 ? (
-                      <div class="two">
-                        {s.items.slice(0, 3).map((im: any) => (
-                          <Image src={im} alt={s.alt || ''} widths={[400, 800]} sizes="400px" />
-                        ))}
-                      </div>
-                    ) : (
-                      <Image src={s.items[0]} alt={s.alt || ''} widths={[800, 1224]} sizes="1224px" />
-                    )
+          {/* ---------- content sheets ---------- */}
+          {sheets.map((sh: any) => (
+            <section class="sheet">
+              {sh.layout === 'text-only' ? (
+                <>
+                  <div class="col" style={`left:${FULL_X}px; width:${WIDE_W}px`}>
+                    {sh.colA.map((b: any) => <TextBlockView b={b} />)}
+                  </div>
+                  {sh.colB.length > 0 && (
+                    <div class="col" style={`left:${WIDE_X2}px; width:${WIDE_W}px`}>
+                      {sh.colB.map((b: any) => <TextBlockView b={b} />)}
+                    </div>
                   )}
-                  {group.some((s) => s.type === 'placeholder') && <div class="ph">Video</div>}
-                </div>
-                <div class="c-right">
-                  {txt.map((s: Sec) => (
-                    <>
-                      {s.type === 'heading' && <div class="cs-title">{s.text}</div>}
-                      {s.label && s.type !== 'heading' && <div class="t-eyebrow">{s.label}</div>}
-                      {s.type === 'challenge' && (
-                        <>
-                          <div class="block"><div class="t-h4">Challenge</div><div class="t-small">{s.challenge}</div></div>
-                          <div class="block"><div class="t-h4">Solution</div><div class="t-small">{s.solution}</div></div>
-                        </>
-                      )}
-                      {(s.type === 'example' || s.type === 'process') && (
-                        <div class="block">
-                          <div class="t-h4">{s.title}</div>
-                          {s.text && <div class="t-small">{s.text}</div>}
-                          {s.items && <div class="t-small">{s.items.map((i: string, n: number) => `[${n + 1}] ${i}`).join('; ')}</div>}
-                        </div>
-                      )}
-                    </>
-                  ))}
-                  {imgs.map((s: Sec) => s.caption && <div class="cap">{s.caption}</div>)}
-                </div>
-                <div class="f-l">Yael Issacharov</div>
-                <div class="f-r">ID N.205789159</div>
-              </section>
-            );
-          })}
+                </>
+              ) : (
+                <>
+                  <div
+                    class="imgstack"
+                    style={`left:${sh.layout === 'image-only' ? FULL_X : IMG_X}px; width:${sh.layout === 'image-only' ? FULL_W : IMG_W}px`}
+                  >
+                    {sh.img?.layout.rows.map((row: any) => (
+                      <div class="imgrow" style={`height:${row.h}px`}>
+                        {row.items.map((im: any) =>
+                          im.ph ? (
+                            <div class="ph" style={`width:${im.w}px; height:${im.h}px`}>{im.note}</div>
+                          ) : (
+                            <Image
+                              src={im.src}
+                              alt={im.alt}
+                              width={Math.round(im.w)}
+                              height={Math.round(im.h)}
+                              widths={[Math.round(im.w), Math.round(im.w * 2)]}
+                              sizes={`${Math.round(im.w)}px`}
+                              style={`width:${im.w}px; height:${im.h}px`}
+                              loading="eager"
+                              decoding="sync"
+                            />
+                          )
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {sh.texts && (
+                    <div class="col" style={`left:${TXT_X}px; width:${TXT_W}px`}>
+                      {sh.texts.map((b: any) => <TextBlockView b={b} />)}
+                    </div>
+                  )}
+                </>
+              )}
+              <div class="f-l">Yael Issacharov</div>
+              <div class="f-r">ID N.205789159</div>
+            </section>
+          ))}
         </>
       ))
     }
